@@ -1,0 +1,38 @@
+with open('setting.json', mode='r', encoding='utf8') as jfile:
+    jdata = json.load(jfile)
+
+
+
+
+Just to store it for now
+@bot.event
+async def on_ready():
+    print("--Bot is Online--")
+    try:
+        synced = await bot.tree.sync()
+        print(f'Synced {len(synced)} command(s)')
+    except Exception as e:
+        print(f'Failed to sync commands: {e}')
+
+#When member joined, send messages
+@bot.event
+async def on_member_join(member):
+    print(f'{member} joined!')
+    if wanted_channel != None:
+        channel = bot.get_channel(wanted_channel)
+        await channel.send(f'{member} joined!')
+    else:
+        await set_wanted_channel(member.guild, given_name=None)
+        channel = bot.get_channel(wanted_channel)
+        await channel.send(f'{member} joined!')
+
+##When member removed, send messages
+@bot.event
+async def on_member_remove(member):
+    if wanted_channel != None:
+        channel = bot.get_channel(wanted_channel)
+        await channel.send(f'{member} removed.')
+    else:
+        await set_wanted_channel(member.guild, given_name=None)
+        channel = bot.get_channel(wanted_channel)
+        await channel.send(f'{member} removed.')
