@@ -1,0 +1,26 @@
+Available Category
+
+Category: General Knowledge, ID: 9
+Category: Entertainment: Books, ID: 10
+Category: Entertainment: Film, ID: 11
+Category: Entertainment: Music, ID: 12
+Category: Entertainment: Musicals & Theatres, ID: 13
+Category: Entertainment: Television, ID: 14
+Category: Entertainment: Video Games, ID: 15
+Category: Entertainment: Board Games, ID: 16
+Category: Science & Nature, ID: 17
+Category: Science: Computers, ID: 18
+Category: Science: Mathematics, ID: 19
+Category: Mythology, ID: 20
+Category: Sports, ID: 21
+Category: Geography, ID: 22
+Category: History, ID: 23
+Category: Politics, ID: 24
+Category: Art, ID: 25
+Category: Celebrities, ID: 26
+Category: Animals, ID: 27
+Category: Vehicles, ID: 28
+Category: Entertainment: Comics, ID: 29
+Category: Science: Gadgets, ID: 30
+Category: Entertainment: Japanese Anime & Manga, ID: 31
+Category: Entertainment: Cartoon & Animations, ID: 32

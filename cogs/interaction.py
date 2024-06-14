@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from header import Cog_Extension
 
-class greetings(Cog_Extension):
+class event(Cog_Extension):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         print(f'{member} joined.')
@@ -23,6 +23,5 @@ class greetings(Cog_Extension):
         latency = self.bot.latency * 1000  # Convert to milliseconds
         await ctx.send(f'Latency: {latency:.2f}ms')
 
-
 async def setup(bot):
-    await bot.add_cog(greetings(bot))
+    await bot.add_cog(event(bot))
