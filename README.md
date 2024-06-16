@@ -112,3 +112,22 @@ Roles
 /mass-role stop - Stop a running mass-role action.
 
 /mass-role status - See the status of a mass-role action.
+
+
+def load_config(guild_id):
+    file_path = f'cogs/configs/{guild_id}.json'
+    if os.path.isfile(file_path):
+        f = open(file_path, 'r')
+        return json.load(f)
+    else:
+        return {
+            "welcome_message": "Welcome to the server, {user}!",
+            "welcome_channel": None,
+            "leave_message": "Goodbye, {user}!",
+            "leave_channel": None
+        }
+        
+def save_config(guild_id, config):
+    file_path = f'cogs/configs/{guild_id}.json'
+    with open(file_path, mode='w') as f:
+        json.dump(config, f, indent=4)

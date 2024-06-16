@@ -2,12 +2,22 @@ import discord
 from discord.ext import commands
 from header import Cog_Extension
 import os, json
+import sqlite3
 
 def load_config(guild_id):
-    file_path = f'cogs/configs/{guild_id}.json'
-    if os.path.isfile(file_path):
-        f = open(file_path, 'r')
-        return json.load(f)
+    conn = sqlite3.connect('cogs/configs/configurations.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM greeting_configs WHERE guild_id = ?', (guild_id,))
+    row = cursor.fetchone()
+    print("cursor fetch successed.")
+    conn.close()
+    if row:
+        return {
+            "welcome_message": row[1],
+            "welcome_channel": row[2],
+            "leave_message": row[3],
+            "leave_channel": row[4]
+        }
     else:
         return {
             "welcome_message": "Welcome to the server, {user}!",
@@ -16,10 +26,17 @@ def load_config(guild_id):
             "leave_channel": None
         }
 
+#Save Configuration to the sqlite
 def save_config(guild_id, config):
-    file_path = f'cogs/configs/{guild_id}.json'
-    with open(file_path, mode='w') as f:
-        json.dump(config, f, indent=4)
+    conn = sqlite3.connect('cogs/configs/configurations.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT OR REPLACE INTO greeting_configs (guild_id, welcome_message, welcome_channel, leave_message, leave_channel)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (guild_id, config['welcome_message'], config['welcome_channel'], config['leave_message'], config['leave_channel']))
+    conn.commit()
+    print("Database commit successed")
+    conn.close()
 
 class greeting(Cog_Extension):
     @commands.Cog.listener()
@@ -28,7 +45,7 @@ class greeting(Cog_Extension):
         print(f'{member} joined.')
         channel = discord.utils.get(member.guild.channels, name=config['welcome_channel'])
         if channel:
-            welcome_message = config['welcome_message'].replace(user=member.mention)
+            welcome_message = config['welcome_message'].format(user=member.mention)
             await channel.send(welcome_message)
     
     @commands.Cog.listener()
@@ -61,7 +78,7 @@ class greeting(Cog_Extension):
     #Welcome msg set up
     @commands.command()
     async def welcome(self, ctx, action: str, *, content: str = None):
-        """Set up Bot Welcoming message"""
+        """Set up Bot Welcoming message/channel"""
         config = load_config(ctx.guild.id)
         if action == 'setMessage':
             config['welcome_message'] = content
@@ -79,7 +96,7 @@ class greeting(Cog_Extension):
     #Leave msg set up
     @commands.command()
     async def leave(self, ctx, action: str, *, content=None):
-        """Set up Bot removing message"""
+        """Set up Bot removing message/channel"""
         config = load_config(ctx.guild.id)
         if action == 'setMessage':
             config['leave_message'] = content
@@ -93,7 +110,6 @@ class greeting(Cog_Extension):
         else:
             await ctx.send(f'Unknown Command')
         save_config(ctx.guild.id, config)
-
 
 async def setup(bot):
     await bot.add_cog(greeting(bot))

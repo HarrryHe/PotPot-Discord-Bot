@@ -4,6 +4,7 @@ from header import Cog_Extension
 from discord.ui import Button, View
 import requests
 import random
+import datetime
 
 class games(Cog_Extension):
     @commands.command()
@@ -36,6 +37,40 @@ class games(Cog_Extension):
             #Currently leave a print msg, will implement it later
             print("Unknown")
 
+    @commands.command()
+    async def triviaHelp(self, ctx):
+        """List trivia question categories ID"""
+        embed=discord.Embed(title="Trivia Help Menu", description="List all the trivia question categories you need for -Trivia [category ID]", color=0xddb6b8, timestamp=datetime.datetime.now())
+        embed.set_author(name="PotPot")
+        categories = [
+            ("General Knowledge", 9),
+            ("Entertainment: Books", 10),
+            ("Entertainment: Film", 11),
+            ("Entertainment: Music", 12),
+            ("Entertainment: Musicals & Theatres", 13),
+            ("Entertainment: Television", 14),
+            ("Entertainment: Video Games", 15),
+            ("Entertainment: Board Games", 16),
+            ("Science & Nature", 17),
+            ("Science: Computers", 18),
+            ("Science: Mathematics", 19),
+            ("Mythology", 20),
+            ("Sports", 21),
+            ("Geography", 22),
+            ("History", 23),
+            ("Politics", 24),
+            ("Art", 25),
+            ("Celebrities", 26),
+            ("Animals", 27),
+            ("Vehicles", 28),
+            ("Entertainment: Comics", 29),
+            ("Science: Gadgets", 30),
+            ("Entertainment: Japanese Anime & Manga", 31),
+            ("Entertainment: Cartoon & Animations", 32),
+        ]
+        for name, id in categories:
+            embed.add_field(name=f"{name}", value=f"ID: {id}", inline=False)
+        await ctx.send(embed=embed)
 
 # --- Num Guessing Game ---
 # This is to show the view in discord
