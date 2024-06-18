@@ -4,7 +4,7 @@ from header import Cog_Extension
 from profanity_check import predict
 from datetime import timedelta
 import sqlite3
-from greetings import load_guild_config, save_guild_config
+from .greetings import load_guild_config, save_guild_config
 
 
 #DB DESIGN General Information:
@@ -52,17 +52,16 @@ profanity_check: bool
 
 class general(Cog_Extension):
 
-    async def apply_timeout(self, user: discord.Member, minutes: int):
-        await user.edit(timed_out_until=discord.utils.utcnow() + timedelta(minutes=minutes))
-    
+    #clean {num} messages
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def clean(self, ctx, num: int = 1):
-        await ctx.channel.purge(limit=num, delete_after=5)
+        await ctx.channel.purge(limit=num)
+        await ctx.send("Purge success", delete_after=5)
     
-
     #Open up or close down the profanity checker
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def profanityChecker(self, ctx, switch: bool=False):
         config = load_guild_config(ctx.guild.id)
         if switch is True:
@@ -74,21 +73,39 @@ class general(Cog_Extension):
     async def apply_timeout(self, user: discord.Member, minutes: int):
         await user.timeout(timedelta(minutes=minutes))
 
+
+    #Currently only for 
     @commands.Cog.listener()
     async def on_message(self, message):
+        guild_config = load_guild_config(message.guild.id)
         if message.author == self.bot.user:
             return
         #on message profanity checker
-        #Currently Just not input database, Because database under constructed
-        if profanity_check is True:
+        if guild_config["profanity_switch"] == 1:
             if predict([message.content])[0] == 1:
+                config = load_user_config(message.guild.id, message.author.id)
                 await message.delete()
                 #To input database right here store which guild which user and how many counts in sqlite
                 await self.apply_timeout(message.author, 3)
-                await message.channel.send(f'{message.author.mention} used bad words, 3 min TIMEOUT applied! :3!!!')
+                if message.author.top_role >= self.bot.user.author.top_role:
+                    await message.channel.send(f"You can only moderate members below your role")         
+                await message.channel.send(f'{message.author.mention} used bad words. 3 min TIMEOUT applied! :3')
                 await message.channel.send('Please keeping the rule otherwise will be auto kicked out!!!')
-        
+                config["profanity_count"] += 1
+                save_user_config(message.author.id, message.guild.id, config)
     
+    #---TIME OUT SECTION---
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def timeout(self, ctx, user: discord.Member, minutes: int):
+        self.apply_timeout(user,minutes)
+        ctx.send(f'{minutes} timeout applied to {user}')
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def timeout_remove(self, ctx, user: discord.Member, minutes = 0):
+        self.apply_timeout(user,0)
+        ctx.send(f'{user} timeout removed')
 
 async def setup(bot):
     await bot.add_cog(general(bot))
