@@ -3,6 +3,7 @@ from discord.ext import commands
 from header import Cog_Extension
 from profanity_check import predict
 from datetime import timedelta
+import datetime
 import sqlite3
 from .greetings import load_guild_config, save_guild_config
 
@@ -52,12 +53,37 @@ profanity_check: bool
 
 class general(Cog_Extension):
 
+    @commands.command()
+    async def info(self, ctx):
+        embed = discord.Embed(title="Server Information", description=f'Server ID: {ctx.guild.id}', timestamp=datetime.datetime.now(), color=0xddb6b8)
+        embed.set_author(name="PotPot", icon_url=self.bot.user.display_avatar.url)
+        if ctx.guild.icon is not None:
+            embed.set_thumbnail(url=ctx.guild.icon.url)
+        else:
+            embed.set_thumbnail(url="https://via.placeholder.com/150")
+        embed.add_field(name="Server Owner", value=ctx.guild.owner, inline=False)
+        embed.add_field(name="Total Members", value=ctx.guild.member_count, inline=False)
+        embed.add_field(name="Total Channels", value=len(ctx.guild.channels), inline=False)
+        embed.add_field(name="Total Roles", value=len(ctx.guild.roles), inline=False)
+        embed.set_footer(text='\u200b')
+        await ctx.send(embed=embed)
+
     #clean {num} messages
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def clean(self, ctx, num: int = 1):
-        await ctx.channel.purge(limit=num)
+    async def clean(self, ctx, limit: int = 100):
+        await ctx.channel.purge(limit=limit)
         await ctx.send("Purge success", delete_after=5)
+    
+    @commands.command()
+    @commands.has_permissions(manage_messages=True)
+    #clean {num} messages up to 100 from {member}
+    async def clean_user(ctx, member: discord.Member, limit: int = 100):
+        def check(m):
+            return m.author == member
+
+        deleted = await ctx.channel.purge(limit=limit, check=check)
+        await ctx.send(f'Deleted {len(deleted)} messages from {member.mention}.', delete_after=5)
     
     #Open up or close down the profanity checker
     @commands.command()
