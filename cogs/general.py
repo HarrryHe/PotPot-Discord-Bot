@@ -7,7 +7,6 @@ import datetime
 import sqlite3
 from .greetings import load_guild_config, save_guild_config
 
-
 #DB DESIGN General Information:
 #User_ID Primary
 #Guild_ID Primary
@@ -99,7 +98,6 @@ class general(Cog_Extension):
     async def apply_timeout(self, user: discord.Member, minutes: int):
         await user.timeout(timedelta(minutes=minutes))
 
-
     #Currently only for 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -119,7 +117,7 @@ class general(Cog_Extension):
                 await message.channel.send('Please keeping the rule otherwise will be auto kicked out!!!')
                 config["profanity_count"] += 1
                 save_user_config(message.author.id, message.guild.id, config)
-    
+
     #---TIME OUT SECTION---
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -132,6 +130,40 @@ class general(Cog_Extension):
     async def timeout_remove(self, ctx, user: discord.Member, minutes = 0):
         self.apply_timeout(user,0)
         ctx.send(f'{user} timeout removed')
+
+    
+    @commands.command()
+    async def poll(self, ctx, question: str, *options: str):
+
+        if not question:
+            await ctx.send("You must input your vote description")
+            return
+
+        if len(options) > 10:
+            await ctx.send("You can only provide up to 10 options.")
+            return
+
+        if len(options) < 2:
+            await ctx.send("You must provide at least two options.")
+            return
+        
+        if len(options) == 2:
+            reaction = ('👍', '👎')
+        else:
+            reaction = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟')[:len(options)]
+        
+        embed = discord.Embed(title=question, description= f'{ctx.message.author} create a vote section', color=0xddb6b8)
+
+        for i, option in enumerate(options):
+            embed.add_field(name=f"Option {i + 1}", value=f"{reaction[i]} {option}", inline=False)
+        
+        poll_message = await ctx.send(embed=embed)
+
+        for reaction in reaction:
+            await poll_message.add_reaction(reaction)
+
+        embed.set_footer(text='Poll ID: {}'.format(poll_message.id))
+        await poll_message.edit(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(general(bot))
