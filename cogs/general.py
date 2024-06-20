@@ -87,7 +87,7 @@ class general(Cog_Extension):
     #Open up or close down the profanity checker
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def profanityChecker(self, ctx, switch: bool=False):
+    async def profanity_check(self, ctx, switch: bool=False):
         config = load_guild_config(ctx.guild.id)
         if switch is True:
             config["profanity_switch"] = 1
@@ -159,11 +159,40 @@ class general(Cog_Extension):
         
         poll_message = await ctx.send(embed=embed)
 
-        for reaction in reaction:
-            await poll_message.add_reaction(reaction)
+        for i in reaction:
+            await poll_message.add_reaction(i)
 
         embed.set_footer(text='Poll ID: {}'.format(poll_message.id))
         await poll_message.edit(embed=embed)
+
+    @commands.command()
+    async def poll_result(self, ctx, poll_message_id: int):
+        try:
+            poll_message = await ctx.fetch_message(poll_message_id)
+        except discord.NotFound:
+            await ctx.send("Poll message not found.")
+            return
+        
+        if not poll_message.embeds:
+            await ctx.send("The provided message ID does not contain an embed.")
+            return
+        
+        reactionList = ('👍', '👎', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟')
+        vote_result = {}
+        embed = poll_message.embeds[0]
+
+        for reaction in poll_message.reactions:
+            if reaction.emoji in reactionList:
+                # Subtract bot's own reaction
+                vote_result[reaction.emoji] = reaction.count - 1
+        
+        results = ""
+
+        for field in embed.fields:
+            emoji = field.value.split()[0]
+            results += f'\n{field.value} has {vote_result.get(emoji)} votes\n'
+
+        await ctx.send(f"Poll results: {embed.title}\n {results}")
 
 async def setup(bot):
     await bot.add_cog(general(bot))
