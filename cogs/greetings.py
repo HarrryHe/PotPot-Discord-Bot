@@ -22,7 +22,8 @@ def load_guild_config(guild_id):
             "welcome_message": row[3],
             "welcome_channel": row[4],
             "leave_message": row[5],
-            "leave_channel": row[6]
+            "leave_channel": row[6],
+            "trigger_channel": row[7]
         }
     else:
         return {
@@ -32,7 +33,8 @@ def load_guild_config(guild_id):
             "welcome_message": "Welcome to the server, {user}!",
             "welcome_channel": None,
             "leave_message": "Goodbye, {user}!",
-            "leave_channel": None
+            "leave_channel": None,
+            "trigger_channel": None
         }
 
 #Save Configuration to the sqlite
@@ -40,8 +42,8 @@ def save_guild_config(guild_id, config):
     conn = sqlite3.connect('cogs/configs/configurations.db')
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT OR REPLACE INTO guild_configs (guild_id, profanity_switch, auto_role_switch, welcome_message, welcome_channel, leave_message, leave_channel)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT OR REPLACE INTO guild_configs (guild_id, profanity_switch, auto_role_switch, welcome_message, welcome_channel, leave_message, leave_channel, trigger_channel)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         guild_id,
         config['profanity_switch'],
@@ -49,7 +51,8 @@ def save_guild_config(guild_id, config):
         config['welcome_message'],
         config['welcome_channel'],
         config['leave_message'],
-        config['leave_channel']
+        config['leave_channel'],
+        config['trigger_channel']
     ))
     conn.commit()
     print("Database commit succeed")
@@ -91,6 +94,7 @@ class greeting(Cog_Extension):
         """Returns the bot's latency in milliseconds."""
         latency = self.bot.latency * 1000  # Convert to milliseconds
         await ctx.send(f'Latency: {latency:.2f}ms')
+
 
     #Welcome msg set up
     @commands.command()

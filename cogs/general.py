@@ -87,7 +87,7 @@ class general(Cog_Extension):
     #Open up or close down the profanity checker
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def profanity_check(self, ctx, switch: bool=False):
+    async def profanity_trigger(self, ctx, switch: bool=False):
         config = load_guild_config(ctx.guild.id)
         if switch is True:
             config["profanity_switch"] = 1
@@ -193,6 +193,15 @@ class general(Cog_Extension):
             results += f'\n{field.value} has {vote_result.get(emoji)} votes\n'
 
         await ctx.send(f"Poll results: {embed.title}\n {results}")
+
+    @commands.command()
+    @commands.has_permissions(manage_channels=True)
+    async def set_trigger_channel(self, ctx, channel: discord.VoiceChannel):
+        config = load_guild_config(ctx.guild.id)
+        config['trigger_channel'] = channel.id
+        save_guild_config(ctx.guild.id, config)
+        await ctx.send(f'Trigger Channel for temporary voice channel creation set to {channel}')
+
 
 async def setup(bot):
     await bot.add_cog(general(bot))

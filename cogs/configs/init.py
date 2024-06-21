@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS guild_configs (
     welcome_message TEXT,
     welcome_channel TEXT,
     leave_message TEXT,
-    leave_channel TEXT
+    leave_channel TEXT,
+    trigger_channel INTEGER
 )
 ''')
 
@@ -27,13 +28,13 @@ cursor.execute('''
     )
     ''')
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS game_configs (
-        game_id INTEGER PRIMARY KEY,
-        FOREIGN KEY (guild_id) REFERENCES guild_configs (guild_id),
-        FOREIGN KEY (user_id) REFERENCES user_configs (user_id)
-    )
-    ''')
+# cursor.execute('''
+#     CREATE TABLE IF NOT EXISTS game_configs (
+#         game_id INTEGER PRIMARY KEY,
+#         FOREIGN KEY (guild_id) REFERENCES guild_configs (guild_id),
+#         FOREIGN KEY (user_id) REFERENCES user_configs (user_id)
+#     )
+#     ''')
 
 conn.commit()
 conn.close()
