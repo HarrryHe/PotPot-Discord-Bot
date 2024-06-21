@@ -131,7 +131,6 @@ class general(Cog_Extension):
         self.apply_timeout(user,0)
         ctx.send(f'{user} timeout removed')
 
-    
     @commands.command()
     async def poll(self, ctx, question: str, *options: str):
 
@@ -199,9 +198,32 @@ class general(Cog_Extension):
     async def set_trigger_channel(self, ctx, channel: discord.VoiceChannel):
         config = load_guild_config(ctx.guild.id)
         config['trigger_channel'] = channel.id
+        if config['trigger_channel'] is not None:
+            category = discord.utils.get(ctx.guild.categories, name="Temporary Channels")
+            if category is None:
+                await ctx.guild.create_category("Temporary Channels")
         save_guild_config(ctx.guild.id, config)
         await ctx.send(f'Trigger Channel for temporary voice channel creation set to {channel}')
 
+    #auto create a temporary channel for user while joining certain channel
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        #read the trigger channel id from database and set the channel name 
+        channel_name = f'{member.display_name}\'s temp channel'
+        trigger_channel_id = load_guild_config(member.guild.id)['trigger_channel']
+        #check if there is trigger id or not
+        if trigger_channel_id is None:
+            print("Trigger Channel is None")
+            return
+
+        if after.channel and after.channel.id == trigger_channel_id:
+            category = discord.utils.get(member.guild.categories, name="Temporary Channels")
+            new_channel = await member.guild.create_voice_channel(name=channel_name, category=category)
+            await member.move_to(new_channel)
+
+        if before.channel and before.channel.category.name == "Temporary Channels":
+            if len(before.channel.members) == 0:
+                await before.channel.delete()
 
 async def setup(bot):
     await bot.add_cog(general(bot))

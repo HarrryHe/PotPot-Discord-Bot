@@ -129,7 +129,6 @@ def get_trivia(amount, category_choice):
     data = response.json()
     question_selected = {}
     #Although here can be implemented more easier but right now just keep it
-    # :)
     if data["response_code"] == 0:
         info = data["results"][0]
         category = info['category']
