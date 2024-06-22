@@ -193,6 +193,8 @@ class general(Cog_Extension):
 
         await ctx.send(f"Poll results: {embed.title}\n {results}")
 
+    #set the trigger channel for temp channel creation, when user click in the temp channel created
+    #user will be moved to the destination channel and  in that temp category
     @commands.command()
     @commands.has_permissions(manage_channels=True)
     async def set_trigger_channel(self, ctx, channel: discord.VoiceChannel):
@@ -224,6 +226,28 @@ class general(Cog_Extension):
         if before.channel and before.channel.category.name == "Temporary Channels":
             if len(before.channel.members) == 0:
                 await before.channel.delete()
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def lock_channel(self, ctx, channel: discord.TextChannel = None):
+        if channel is None:
+            channel = channel or ctx.channel
+        #get the permission for overwrites
+        overwrite = channel.overwrites_for(ctx.guild.default_role)
+        overwrite.send_messages = False
+        await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+        await ctx.send("channel lock successfully")
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def unlock_channel(self, ctx, channel: discord.TextChannel = None):
+        if channel is None:
+            channel = channel or ctx.channel
+        #get the permission for overwrites
+        overwrite = channel.overwrites_for(ctx.guild.default_role)
+        overwrite.send_messages = None
+        await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+        await ctx.send("channel unlock successfully")
 
 async def setup(bot):
     await bot.add_cog(general(bot))
