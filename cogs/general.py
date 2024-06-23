@@ -114,7 +114,6 @@ class general(Cog_Extension):
                 if message.author.top_role >= self.bot.user.author.top_role:
                     await message.channel.send(f"You can only moderate members below your role")         
                 await message.channel.send(f'{message.author.mention} used bad words. 3 min TIMEOUT applied! :3')
-                await message.channel.send('Please keeping the rule otherwise will be auto kicked out!!!')
                 config["profanity_count"] += 1
                 save_user_config(message.author.id, message.guild.id, config)
 
@@ -230,24 +229,72 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def lock_channel(self, ctx, channel: discord.TextChannel = None):
-        if channel is None:
-            channel = channel or ctx.channel
+        channel = channel or ctx.channel
         #get the permission for overwrites
         overwrite = channel.overwrites_for(ctx.guild.default_role)
         overwrite.send_messages = False
         await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-        await ctx.send("channel lock successfully")
+        await ctx.send(f"{channel.mention} lock successfully")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def unlock_channel(self, ctx, channel: discord.TextChannel = None):
-        if channel is None:
-            channel = channel or ctx.channel
+        channel = channel or ctx.channel
         #get the permission for overwrites
         overwrite = channel.overwrites_for(ctx.guild.default_role)
         overwrite.send_messages = None
         await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-        await ctx.send("channel unlock successfully")
+        await ctx.send(f"{channel.mention} channel unlock successfully")
+
+    @commands.command()
+    @commands.has_permissions(manage_roles=True)
+    async def add_role(self, ctx, member=discord.Member, role=discord.Role):
+        if role in member.roles:
+            await ctx.send(f"{member.display_name} already in {role.name}")
+        else:
+            await member.add_roles(role)
+            await ctx.send(f"add {role.name} to {member.display_name}")
+
+    @commands.command()
+    @commands.has_permissions(manage_roles=True)
+    async def remove_role(self, ctx, member: discord.Member, role: discord.Role):
+        if role not in member.roles:
+            await ctx.send(f"{member.display_name} is not in {role.name}")
+        else:
+            await member.remove_roles(role)
+            await ctx.send(f"remove {member.display_name} from {role.name}")
+
+    @commands.command()
+    @commands.has_permissions(manage_roles=True)
+    async def create_role(self, ctx, *, role_name: str):
+        existing_role = discord.utils.get(ctx.guild.roles, name=role_name)
+        if existing_role:
+            await ctx.send(f"{role_name} already exist")
+        else:
+            new_role = await ctx.guild.create_role(name=role_name)
+            await ctx.send(f"created {new_role.name}")
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def prune(self, ctx, days: int = 30):
+        threshold = datetime.utcnow() - timedelta(days=days)
+        inactive_members = []
+        active_members = []
+
+        for channel in ctx.guild.channels:
+            try:
+                async for message in channel.history(limit=None, after=threshold):
+                    #check if the message author is the bot or not
+                    if message.author == self.bot.user:
+                        pass
+                    if message.author.id not in active_members:
+                        active_members.append(message.author.id)
+            #this represent discord bot did not have permission
+            except discord.Forbidden:
+                continue
+        
+        for member in ctx.guild.members:
+            pass
 
 async def setup(bot):
     await bot.add_cog(general(bot))

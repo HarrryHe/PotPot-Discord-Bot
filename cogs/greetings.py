@@ -86,7 +86,8 @@ class greeting(Cog_Extension):
             except Exception as e:
                 print(f"An error occurred: {e}")
                 return
-            if message.content in data:
+            msg = message.content.lower()
+            if msg in data:
                 await message.channel.send(data[message.content])
 
     @commands.command()

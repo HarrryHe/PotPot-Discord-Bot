@@ -34,8 +34,8 @@ class games(Cog_Extension):
             view = TriviaView(correct_answer, options)
             await ctx.send(f'Category: {category}\nQuestion: {question}', view=view)
         else:
-            #Currently leave a print msg, will implement it later
-            print("Unknown")
+            print("Cannot fetch data from database")
+            return
 
     @commands.command()
     async def triviaHelp(self, ctx):
