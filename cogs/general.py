@@ -6,6 +6,7 @@ from datetime import timedelta
 import datetime
 import sqlite3
 from .greetings import load_guild_config, save_guild_config
+import asyncio
 
 #DB DESIGN General Information:
 #User_ID Primary
@@ -293,8 +294,38 @@ class general(Cog_Extension):
             except discord.Forbidden:
                 continue
         
+        #if member joined before the dest time and they are not in active_member list
         for member in ctx.guild.members:
-            pass
+            if member not in active_members:
+                if member.joined_at < threshold:
+                    inactive_members.append(member)
+        
+        if not inactive_members:
+            await ctx.send("There is no inactive members in the guild. Good Job!")
+            return
+        
+        inactive = "\n".join([f"{member.name}" for member in inactive_members])
+        await ctx.send(f"The following are the list of inactive members for {days}: \n{inactive}")
+        await ctx.send("Do you want to delete them？(yes/no)")
+        
+        #very long check lol
+        def check(msg):
+            return msg.author == ctx.author and msg.channel==ctx.channel and msg.content.lower() in ["yes", "n", "t", "f", "true", "false"]
+
+        try:
+            msg = await self.bot.wait_for('message', check=check, timeout=30)
+            if msg.content.lower() == "yes" or "t" or "true":
+                for member in inactive_members:
+                    try:
+                        await member.kick(reason="Inactive for too long")
+                    except discord.Forbidden:
+                        await ctx.send(f"cannot remove {member}")
+                await ctx.send("inactive members removed successfully")
+            else:
+                await ctx.send("Prune command canceled")
+        except asyncio.TimeoutError:
+            await ctx.send("time out! Prune command canceled")
+
 
 async def setup(bot):
     await bot.add_cog(general(bot))
