@@ -7,6 +7,8 @@ import requests
 import random
 import datetime
 
+lock = asyncio.Lock()
+
 class games(Cog_Extension):
 
     @commands.command()
@@ -39,9 +41,37 @@ class games(Cog_Extension):
         await ctx.send(f'{user.mention}, You choose: ')
         await ctx.send(f'{choice}')
 
+    #constructing =============================================
     @commands.command()
     async def RussianRoulette(self, ctx):
-        pass
+        loading_bar = ""
+        empty_bar = "░░" * 5
+        temp_count = 5
+        embed = discord.Embed(
+        title='Russian Roulette Game', 
+        description=f'Loading Bullet for -user- and -bot-\n[{loading_bar}{empty_bar}]', 
+        color=0xddb6b8
+    )
+        embed.set_image(url="https://media1.tenor.com/m/zHJNFjLxqHcAAAAC/cdd.gif")
+        message = await ctx.send(embed=embed)
+        #these are actually useless commands but making the UI cooler
+        for i in range(5):
+            await asyncio.sleep(1)
+            loading_bar += "██"
+            temp_count -= 1
+            empty_bar = "░░" * temp_count
+            embed.description=f'Loading Bullet for -user- and -bot-\n[{loading_bar}{empty_bar}]'
+            await message.edit(embed=embed)
+
+        # Update description and remove image
+        embed.description=f'bullet loaded into revolver\nnow spining cylinder...'
+        await message.edit(embed=embed)
+        await asyncio.sleep(3)
+        embed.set_image(url=None)
+        embed.description='-User- VS -Bot-'
+        embed.insert_field_at(index=0, name=f'{ctx.author} 🤠', value='\u200b', inline=False)
+        embed.insert_field_at(index=1, name=f'{self.bot.user.name} 🤖', value='\u200b', inline=False)
+        await message.edit(embed=embed)
 
     @commands.command()
     async def Trivia(self, ctx, *, category_choice: int = None):
@@ -204,6 +234,7 @@ class RussianRouletteView(View):
 
     random.shuffle(my_gun)
     random.shuffle(bot_gun)
+
 
     
 

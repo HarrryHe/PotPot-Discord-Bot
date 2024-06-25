@@ -278,11 +278,11 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def prune(self, ctx, days: int = 30):
-        threshold = datetime.utcnow() - timedelta(days=days)
+        threshold = datetime.datetime.now(datetime.UTC) - timedelta(days=days)
         inactive_members = []
         active_members = []
 
-        for channel in ctx.guild.channels:
+        for channel in ctx.guild.text_channels:
             try:
                 async for message in channel.history(limit=None, after=threshold):
                     #check if the message author is the bot or not
@@ -297,7 +297,7 @@ class general(Cog_Extension):
         #if member joined before the dest time and they are not in active_member list
         for member in ctx.guild.members:
             if member.id not in active_members and not member.bot:
-                if member.joined_at < threshold:
+                if member.joined_at and member.joined_at < threshold:
                     inactive_members.append(member)
         
         if not inactive_members:
@@ -305,16 +305,16 @@ class general(Cog_Extension):
             return
         
         inactive = "\n".join([f"{member.name}" for member in inactive_members])
-        await ctx.send(f"The following are the list of inactive members for {days}: \n{inactive}")
+        await ctx.send(f"The following are the list of inactive members for {days} day(s): \n{inactive}")
         await ctx.send("Do you want to delete them？(yes/no)")
         
         #very long check lol
         def check(msg):
-            return msg.author == ctx.author and msg.channel==ctx.channel and msg.content.lower() in ["yes", "n", "t", "f", "true", "false"]
+            return msg.author == ctx.author and msg.channel==ctx.channel and msg.content.lower() in ["yes", "no", "t", "f", "true", "false"]
 
         try:
             msg = await self.bot.wait_for('message', check=check, timeout=45)
-            if msg.content.lower() == "yes" or "t" or "true":
+            if msg.content.lower() == "yes" or msg.content.lower() == "t" or msg.content.lower() == "true":
                 for member in inactive_members:
                     try:
                         await member.kick(reason="Inactive for too long")
@@ -324,7 +324,7 @@ class general(Cog_Extension):
             else:
                 await ctx.send("Prune command canceled")
         except asyncio.TimeoutError:
-            await ctx.send("time out! Prune command canceled")
+            await ctx.send("Time out! Prune command canceled")
 
 async def setup(bot):
     await bot.add_cog(general(bot))
