@@ -2,11 +2,28 @@ import discord
 from discord.ext import commands
 from header import Cog_Extension
 from discord.ui import Button, View
+import asyncio
 import requests
 import random
 import datetime
 
 class games(Cog_Extension):
+
+    @commands.command()
+    async def roll(self, ctx, side: int = 6):
+        """Roll a {number}>= 3 sides dice."""
+        if side < 3:
+            await ctx.send("the sides of the dice must be above or equal to 3")
+        else:
+            result = random.randint(1, side)
+            await ctx.send(f"result: {result}")
+
+    @commands.command()
+    async def flip(self, ctx):
+        """Flip a coin."""
+        result = random.choice(['heads', 'tails'])
+        await ctx.send(f"result: {result}")
+
     @commands.command()
     async def NumGuessGame(self, ctx):
         """Start a guessing game with buttons."""
@@ -21,6 +38,10 @@ class games(Cog_Extension):
         choice = random.choice(choices)
         await ctx.send(f'{user.mention}, You choose: ')
         await ctx.send(f'{choice}')
+
+    @commands.command()
+    async def RussianRoulette(self, ctx):
+        pass
 
     @commands.command()
     async def Trivia(self, ctx, *, category_choice: int = None):
@@ -174,6 +195,17 @@ class TriviaButton(Button):
         else:
             await interaction.response.edit_message(view=None)
             await interaction.followup.send(f"Oops! The correct answer is {self.is_correct}")
+
+# --- Russian Roulette View ---
+class RussianRouletteView(View):
+
+    my_gun = ['empty', 'empty', 'empty', 'empty', 'empty', 'bullet']
+    bot_gun = ['empty', 'empty', 'empty', 'empty', 'empty', 'bullet']
+
+    random.shuffle(my_gun)
+    random.shuffle(bot_gun)
+
+    
 
 async def setup(bot):
     await bot.add_cog(games(bot))

@@ -67,7 +67,7 @@ class greeting(Cog_Extension):
         if channel:
             welcome_message = config['welcome_message'].format(user=member.mention)
             await channel.send(welcome_message)
-    
+
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         print(f'{member} removed.')
@@ -95,7 +95,6 @@ class greeting(Cog_Extension):
         """Returns the bot's latency in milliseconds."""
         latency = self.bot.latency * 1000  # Convert to milliseconds
         await ctx.send(f'Latency: {latency:.2f}ms')
-
 
     #Welcome msg set up
     @commands.command()

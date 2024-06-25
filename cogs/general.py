@@ -123,13 +123,13 @@ class general(Cog_Extension):
     @commands.has_permissions(administrator=True)
     async def timeout(self, ctx, user: discord.Member, minutes: int):
         self.apply_timeout(user,minutes)
-        ctx.send(f'{minutes} timeout applied to {user}')
+        await ctx.send(f'{minutes} timeout applied to {user.name}')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def timeout_remove(self, ctx, user: discord.Member, minutes = 0):
         self.apply_timeout(user,0)
-        ctx.send(f'{user} timeout removed')
+        await ctx.send(f'{user.name} timeout removed')
 
     @commands.command()
     async def poll(self, ctx, question: str, *options: str):
@@ -249,7 +249,7 @@ class general(Cog_Extension):
 
     @commands.command()
     @commands.has_permissions(manage_roles=True)
-    async def add_role(self, ctx, member=discord.Member, role=discord.Role):
+    async def add_role(self, ctx, member: discord.Member, role: discord.Role):
         if role in member.roles:
             await ctx.send(f"{member.display_name} already in {role.name}")
         else:
@@ -286,7 +286,7 @@ class general(Cog_Extension):
             try:
                 async for message in channel.history(limit=None, after=threshold):
                     #check if the message author is the bot or not
-                    if message.author == self.bot.user:
+                    if message.author.bot:
                         pass
                     if message.author.id not in active_members:
                         active_members.append(message.author.id)
@@ -296,7 +296,7 @@ class general(Cog_Extension):
         
         #if member joined before the dest time and they are not in active_member list
         for member in ctx.guild.members:
-            if member not in active_members:
+            if member.id not in active_members and not member.bot:
                 if member.joined_at < threshold:
                     inactive_members.append(member)
         
@@ -313,19 +313,18 @@ class general(Cog_Extension):
             return msg.author == ctx.author and msg.channel==ctx.channel and msg.content.lower() in ["yes", "n", "t", "f", "true", "false"]
 
         try:
-            msg = await self.bot.wait_for('message', check=check, timeout=30)
+            msg = await self.bot.wait_for('message', check=check, timeout=45)
             if msg.content.lower() == "yes" or "t" or "true":
                 for member in inactive_members:
                     try:
                         await member.kick(reason="Inactive for too long")
                     except discord.Forbidden:
-                        await ctx.send(f"cannot remove {member}")
+                        await ctx.send(f"cannot remove {member.name}")
                 await ctx.send("inactive members removed successfully")
             else:
                 await ctx.send("Prune command canceled")
         except asyncio.TimeoutError:
             await ctx.send("time out! Prune command canceled")
-
 
 async def setup(bot):
     await bot.add_cog(general(bot))
