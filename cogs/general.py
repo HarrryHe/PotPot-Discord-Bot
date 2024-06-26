@@ -94,6 +94,7 @@ class general(Cog_Extension):
             config["profanity_switch"] = 1
         else:
             config["profanity_switch"] = 0
+        await ctx.send("profanity_trigger set succussful")
         save_guild_config(ctx.guild.id, config)
     
     async def apply_timeout(self, user: discord.Member, minutes: int):
@@ -109,11 +110,9 @@ class general(Cog_Extension):
         if guild_config["profanity_switch"] == 1:
             if predict([message.content])[0] == 1:
                 await message.delete()
-                #To input database right here store which guild which user and how many counts in sqlite
                 await self.apply_timeout(message.author, 2)
-                if message.author.top_role >= self.bot.user.author.top_role:
-                    await message.channel.send(f"You can only moderate members below your role")         
                 await message.channel.send(f'{message.author.mention} used bad words. 2 min TIMEOUT applied! :3')
+        await self.bot.process_commands(message)
 
     #---TIME OUT SECTION---
     @commands.command()

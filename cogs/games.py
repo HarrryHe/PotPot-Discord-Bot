@@ -248,7 +248,7 @@ class RussianRouletteView(View):
             embed.set_field_at(index=0, name=f'{interaction.user} 💀💥', value='status: DEAD', inline=False)
             embed.set_field_at(index=2, name='Result Board', value='User lose, Bot win!', inline=False)
             await interaction.edit_original_response(embed=embed, view=None)
-            await interaction.followup.send('Well, partner, looks like this ain\'t your lucky day. But the West always has a second chance!')
+            await interaction.followup.send('You Lose! Well, partner, looks like this ain\'t your lucky day. But the West always has a second chance!')
             return
         else:
             followup_message = await interaction.followup.send('Phew! That was close, cowboy! Keep riding high! It\'s bot turn now.')
@@ -266,7 +266,7 @@ class RussianRouletteView(View):
             embed.set_field_at(index=1, name=f'{interaction.client.user.name} 💀💥', value='status: DEAD', inline=False)
             embed.set_field_at(index=2, name='Result Board', value='Bot lose, User win!', inline=False)
             await interaction.edit_original_response(embed=embed, view=None)
-            await interaction.followup.send('The West is tough, but so are you. Congratulations on your victory!')
+            await interaction.followup.send('You Win! The West is tough, but so are you. Congratulations on your victory!')
             return
         else:
             followup_message = await interaction.followup.send('The bot missed its shot. It\'s your turn now, partner!')
@@ -278,11 +278,10 @@ class RussianRouletteView(View):
         button.disabled = False
         await interaction.edit_original_response(embed=embed, view=self)
         random.shuffle(self.gun)
-        await asyncio.sleep(2)
     
     @discord.ui.button(label="Quit Like A Coward", style=discord.ButtonStyle.red)
     async def quit_callback(self, interaction: discord.Interaction, button: discord.ui.Button, ):
-        await interaction.response.edit_message(content="Game Canceled.", view=None)
+        await interaction.response.edit_message(content="Game Canceled.", embed=None, view=None)
     
 async def setup(bot):
     await bot.add_cog(games(bot))
