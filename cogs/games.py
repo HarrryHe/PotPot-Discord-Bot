@@ -247,12 +247,14 @@ class RussianRouletteView(View):
         if result == 'bullet':
             embed.set_field_at(index=0, name=f'{interaction.user} 💀💥', value='status: DEAD', inline=False)
             embed.set_field_at(index=2, name='Result Board', value='User lose, Bot win!', inline=False)
-            await interaction.response.edit_message(embed=embed, view=None)
+            await interaction.edit_original_response(embed=embed, view=None)
             await interaction.followup.send('Well, partner, looks like this ain\'t your lucky day. But the West always has a second chance!')
             return
         else:
-            await interaction.followup.send('Phew! That was close, cowboy! Keep riding high! It\'s bot turn now.')
-        embed.set_field_at(index=2, name='Result Board', value='Bot\'s Turn', inline=False)
+            followup_message = await interaction.followup.send('Phew! That was close, cowboy! Keep riding high! It\'s bot turn now.')
+            await asyncio.sleep(2)
+            await followup_message.delete()
+        embed.set_field_at(index=2, name='Result Board', value='Bot\'s Turn. Bot thinking...', inline=False)
         await interaction.edit_original_response(embed=embed, view=self)
 
         random.shuffle(self.gun)
@@ -267,13 +269,16 @@ class RussianRouletteView(View):
             await interaction.followup.send('The West is tough, but so are you. Congratulations on your victory!')
             return
         else:
-            await interaction.followup.send('The bot missed its shot. It\'s your turn now, partner!')
+            followup_message = await interaction.followup.send('The bot missed its shot. It\'s your turn now, partner!')
+            await asyncio.sleep(2)
+            await followup_message.delete()
         embed.set_field_at(index=2, name='Result Board', value='User\'s Turn', inline=False)
 
         #Giving the button back to the user
         button.disabled = False
-        await interaction.response.edit_message(embed=embed, view=self)
-        await asyncio.sleep(1)
+        await interaction.edit_original_response(embed=embed, view=self)
+        random.shuffle(self.gun)
+        await asyncio.sleep(2)
     
     @discord.ui.button(label="Quit Like A Coward", style=discord.ButtonStyle.red)
     async def quit_callback(self, interaction: discord.Interaction, button: discord.ui.Button, ):

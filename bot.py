@@ -29,7 +29,6 @@ async def load_extensions():
         if filename.endswith('.py') and filename != "__init__.py":
             await bot.load_extension(f'cogs.{filename[:-3]}')
 
-
 if __name__ == "__main__":
     bot.run(os.getenv("DISCORD_BOT_TOKEN"))
 
