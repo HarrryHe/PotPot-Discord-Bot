@@ -41,7 +41,6 @@ class games(Cog_Extension):
         await ctx.send(f'{user.mention}, You choose: ')
         await ctx.send(f'{choice}')
 
-    #constructing =============================================
     @commands.command()
     async def RussianRoulette(self, ctx):
         loading_bar = ""
@@ -63,15 +62,15 @@ class games(Cog_Extension):
             embed.description=f'Loading Bullet for -user- and -bot-\n[{loading_bar}{empty_bar}]'
             await message.edit(embed=embed)
 
-        # Update description and remove image
         embed.description=f'bullet loaded into revolver\nnow spining cylinder...'
         await message.edit(embed=embed)
         await asyncio.sleep(3)
+        # Update description and remove image
         embed.set_image(url=None)
         embed.description='-User- VS -Bot-'
         embed.insert_field_at(index=0, name=f'{ctx.author} 🤠', value='status: survive', inline=False)
         embed.insert_field_at(index=1, name=f'{self.bot.user.name} 🤖', value='status: survive', inline=False)
-        embed.insert_field_at(index=2, name='Result Board', value='-', inline=False)
+        embed.insert_field_at(index=2, name='Result Board', value='User\'s Turn', inline=False)
         view=RussianRouletteView()
         await message.edit(embed=embed, view=view)
 
@@ -232,47 +231,48 @@ class TriviaButton(Button):
 class RussianRouletteView(View):
     def __init__(self):
         super().__init__()
-        self.my_gun = ['empty', 'empty', 'empty', 'empty', 'empty', 'bullet']
-        self.bot_gun = ['empty', 'empty', 'empty', 'empty', 'empty', 'bullet']
-        random.shuffle(self.my_gun)
-        random.shuffle(self.bot_gun)
+        self.gun = ['empty', 'empty', 'empty', 'empty', 'empty', 'bullet']
+        random.shuffle(self.gun)
     
     @discord.ui.button(label="Pull The Trigger", style=discord.ButtonStyle.green)
     async def trigger_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        #get the embed from the content
         await asyncio.sleep(1)
         embed = interaction.message.embeds[0]
+        #disable the button for amount of time
+        button.disabled = True
+        await interaction.response.edit_message(embed=embed, view=self)
 
-        user_result = self.my_gun[0]
-        bot_result = self.bot_gun[0]
-
-        if user_result == 'bullet' and bot_result == 'empty':
+        #user's turn
+        result = self.gun[0]
+        if result == 'bullet':
             embed.set_field_at(index=0, name=f'{interaction.user} 💀💥', value='status: DEAD', inline=False)
             embed.set_field_at(index=2, name='Result Board', value='User lose, Bot win!', inline=False)
             await interaction.response.edit_message(embed=embed, view=None)
             await interaction.followup.send('Well, partner, looks like this ain\'t your lucky day. But the West always has a second chance!')
-        elif user_result == 'empty' and bot_result == 'bullet':
-            embed.set_field_at(index=1, name=f'{interaction.client.user.name} 💀💥', value='status: DEAD', inline=False)
-            embed.set_field_at(index=2, name='Result Board', value='User win, Bot lose!', inline=False)
-            await interaction.response.edit_message(embed=embed, view=None)
-            word = random.choice(['Looks like Lady Luck is on your side, partner!', 'You\'re as lucky as a horse with a golden horseshoe!'])
-            await interaction.followup.send(f'YOU WIN! {word}')
-        elif user_result == 'bullet' and bot_result == 'bullet':
-            embed.set_field_at(index=0, name=f'{interaction.user} 💀💥', value='status: DEAD', inline=False)
-            embed.set_field_at(index=1, name=f'{interaction.client.user.name} 💀💥', value='status: DEAD', inline=False)
-            embed.set_field_at(index=2, name='Result Board', value='Tie!', inline=False)
-            await interaction.response.edit_message(embed=embed, view=None)
-            await interaction.followup.send('A standoff like this deserves another round. Are you ready to duel again?')
+            return
         else:
-            embed.set_field_at(index=2, name='Result Board', value='Both Survived! Good luck on next shot!', inline=False)
-            await interaction.response.edit_message(embed=embed)
-            goodluck = random.choice(['No bullet this time, partner. Your luck\'s holding strong!', 'Another empty chamber. Fortune favors the bold, keep going!', 'You dodged the bullet, just like a true gunslinger!'])
-            followup_message = await interaction.followup.send(goodluck)
-            await asyncio.sleep(2)
-            await followup_message.delete()  
+            await interaction.followup.send('Phew! That was close, cowboy! Keep riding high! It\'s bot turn now.')
+        embed.set_field_at(index=2, name='Result Board', value='Bot\'s Turn', inline=False)
+        await interaction.edit_original_response(embed=embed, view=self)
 
-        self.my_gun.pop(0)
-        self.bot_gun.pop(0)
+        random.shuffle(self.gun)
+        result = self.gun[0]
+        #Bot's turn
+        #Bot pretend to think
+        await asyncio.sleep(2)
+        if result == 'bullet':
+            embed.set_field_at(index=1, name=f'{interaction.client.user.name} 💀💥', value='status: DEAD', inline=False)
+            embed.set_field_at(index=2, name='Result Board', value='Bot lose, User win!', inline=False)
+            await interaction.edit_original_response(embed=embed, view=None)
+            await interaction.followup.send('The West is tough, but so are you. Congratulations on your victory!')
+            return
+        else:
+            await interaction.followup.send('The bot missed its shot. It\'s your turn now, partner!')
+        embed.set_field_at(index=2, name='Result Board', value='User\'s Turn', inline=False)
+
+        #Giving the button back to the user
+        button.disabled = False
+        await interaction.response.edit_message(embed=embed, view=self)
         await asyncio.sleep(1)
     
     @discord.ui.button(label="Quit Like A Coward", style=discord.ButtonStyle.red)

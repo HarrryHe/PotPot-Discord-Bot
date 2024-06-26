@@ -88,7 +88,7 @@ class greeting(Cog_Extension):
                 return
             msg = message.content.lower()
             if msg in data:
-                await message.channel.send(data[message.content])
+                await message.channel.send(data[msg])
 
     @commands.command()
     async def ping(self, ctx):
