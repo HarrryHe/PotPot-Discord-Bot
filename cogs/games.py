@@ -1,15 +1,36 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from header import Cog_Extension
 from discord.ui import Button, View
 import asyncio
 import requests
 import random
 import datetime
+import json
 
 lock = asyncio.Lock()
 
 class games(Cog_Extension):
+    def select_animal(self):
+        try:
+            f = open('utils/animal.json', mode='r', encoding='utf-8')
+            data = json.load(f)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return
+        choice = random.uniform(1,100)
+        if choice <= 60:
+            category = "common"
+        elif choice <= 80:
+            category = "uncommon"
+        elif choice <= 91:
+            category = "rare"
+        elif choice <= 99.5:
+            category = "very_rare"
+        else:
+            category = "legendary"
+
+        return random.choice(list(data[category].items))
 
     @commands.command()
     async def roll(self, ctx, side: int = 6):
@@ -233,11 +254,12 @@ class RussianRouletteView(View):
         super().__init__()
         self.gun = ['empty', 'empty', 'empty', 'empty', 'empty', 'bullet']
         random.shuffle(self.gun)
-    
+
     @discord.ui.button(label="Pull The Trigger", style=discord.ButtonStyle.green)
     async def trigger_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await asyncio.sleep(1)
         embed = interaction.message.embeds[0]
+
         #disable the button for amount of time
         button.disabled = True
         await interaction.response.edit_message(embed=embed, view=self)
@@ -254,6 +276,7 @@ class RussianRouletteView(View):
             followup_message = await interaction.followup.send('Phew! That was close, cowboy! Keep riding high! It\'s bot turn now.')
             await asyncio.sleep(2)
             await followup_message.delete()
+
         embed.set_field_at(index=2, name='Result Board', value='Bot\'s Turn. Bot thinking...', inline=False)
         await interaction.edit_original_response(embed=embed, view=self)
 
@@ -282,6 +305,6 @@ class RussianRouletteView(View):
     @discord.ui.button(label="Quit Like A Coward", style=discord.ButtonStyle.red)
     async def quit_callback(self, interaction: discord.Interaction, button: discord.ui.Button, ):
         await interaction.response.edit_message(content="Game Canceled.", embed=None, view=None)
-    
+
 async def setup(bot):
     await bot.add_cog(games(bot))

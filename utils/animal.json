@@ -1,0 +1,62 @@
+{
+    "common": {
+        "dog": 10,
+        "cat": 10,
+        "rabbit": 10,
+        "squirrel": 10,
+        "mouse": 10,
+        "sparrow": 10,
+        "pigeon": 10,
+        "duck": 10,
+        "chicken": 10,
+        "hamster": 10
+    },
+    "uncommon": {
+        "horse": 20,
+        "cow": 20,
+        "sheep": 20,
+        "goose": 20,
+        "owl": 20,
+        "seagull": 20,
+        "frog": 20,
+        "lizard": 20,
+        "goldfish": 20,
+        "guinea pig": 20
+    },
+    "rare": {
+        "elephant": 30,
+        "lion": 30,
+        "tiger": 30,
+        "bear": 30,
+        "eagle": 30,
+        "parrot": 30,
+        "penguin": 30,
+        "swan": 30,
+        "koala": 30,
+        "panda": 30
+    },
+    "very_rare": {
+        "fox": 40,
+        "deer": 40,
+        "dolphin": 40,
+        "shark": 40,
+        "whale": 40,
+        "kangaroo": 40,
+        "meerkat": 40,
+        "flamingo": 40,
+        "peacock": 40,
+        "seal": 40
+    },
+    "legendary": {
+        "platypus": 50,
+        "cheetah": 50,
+        "red panda": 50,
+        "snow leopard": 50,
+        "white tiger": 50,
+        "arctic fox": 50,
+        "narwhal": 50,
+        "lynx": 50,
+        "ocelot": 50,
+        "fossa": 50
+    }
+}

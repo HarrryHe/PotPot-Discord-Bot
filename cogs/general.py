@@ -112,7 +112,6 @@ class general(Cog_Extension):
                 await message.delete()
                 await self.apply_timeout(message.author, 2)
                 await message.channel.send(f'{message.author.mention} used bad words. 2 min TIMEOUT applied! :3')
-        await self.bot.process_commands(message)
 
     #---TIME OUT SECTION---
     @commands.command()
