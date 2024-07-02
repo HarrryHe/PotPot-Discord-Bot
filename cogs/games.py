@@ -29,8 +29,31 @@ class games(Cog_Extension):
             category = "very_rare"
         else:
             category = "legendary"
-
         return random.choice(list(data[category].items))
+
+    async def announce_animal(self):
+        await self.bot.wait_until_ready()
+        while not self.bot.is_closed():
+            time_intervals = []
+
+            #cut the 24hrs into 10 periods
+            time_period = 24 * 60 * 60 // 10
+            #so we are planning to announce the animal escaping announcement 10 times a day randomly
+            #generated random time in each period
+            for i in range(10):
+                start = i * time_period
+                end = (i+1) * time_period - 1
+                time_intervals.append(random.randint(start, end))
+            time_intervals.sort()
+
+            for interval in time_intervals:
+                now = datetime.datetime.now()
+                target_time = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(seconds=interval)
+                wait_time = (target_time - now).total_seconds()
+
+                if wait_time < 0:
+                    wait_time = 0
+                await asyncio.sleep(wait_time)
 
     @commands.command()
     async def roll(self, ctx, side: int = 6):
