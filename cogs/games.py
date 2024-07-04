@@ -7,10 +7,24 @@ import requests
 import random
 import datetime
 import json
+from .helper import load_guild_config, save_guild_config, load_user_config, save_user_config
 
 lock = asyncio.Lock()
 
 class games(Cog_Extension):
+    def __init__(self, bot):
+        super().__init__()
+        self.guild_tasks = None
+        self.caught_user = set()
+
+    @commands.command()
+    @commands.has_permissions(manage_channels=True)
+    async def set_quest_channel(self, ctx, channel: discord.TextChannel):
+        config = load_guild_config(ctx.guild.id)
+        config['quest_channel'] = channel.id
+        save_guild_config(ctx.guild.id, config)
+        await ctx.send(f"Quest channel set to {channel.mention}")
+
     def select_animal(self):
         try:
             f = open('utils/animal.json', mode='r', encoding='utf-8')
@@ -34,8 +48,13 @@ class games(Cog_Extension):
     async def announce_animal(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
-            time_intervals = []
+            #wait till the midnight to start this mission
+            now = datetime.datetime.now()
+            next_midnight = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+            wait_time = (next_midnight - now).total_seconds()
+            await asyncio.sleep(wait_time)
 
+            time_intervals = []
             #cut the 24hrs into 10 periods
             time_period = 24 * 60 * 60 // 10
             #so we are planning to announce the animal escaping announcement 10 times a day randomly
@@ -46,6 +65,7 @@ class games(Cog_Extension):
                 time_intervals.append(random.randint(start, end))
             time_intervals.sort()
 
+            #start interpret each announcement using for loop (total 10)
             for interval in time_intervals:
                 now = datetime.datetime.now()
                 target_time = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(seconds=interval)
@@ -54,6 +74,45 @@ class games(Cog_Extension):
                 if wait_time < 0:
                     wait_time = 0
                 await asyncio.sleep(wait_time)
+
+                #initialization
+                animal, points = self.select_animal()
+                self.guild_tasks = {'animal': animal, 'points': points, 'time': datetime.datetime.now()}
+                #make sure to clear all the users in the set that catches last animal
+                self.caught_user.clear()
+
+                #in each guilds
+                for guild in self.bot.guilds:
+                    config = load_guild_config(guild.id)
+                    quest_channel_id = config.get('quest_channel')
+                    if quest_channel_id:
+                        channel = self.bot.get_channel(quest_channel_id)
+                        if channel:
+                            await channel.send(f"An animal has escaped! It's a {animal}. Type \'-catch\' to catch it and earn {points} points! You have 30 minutes to catch it.")
+
+    @commands.command()
+    async def catch(self, ctx):
+        guild_id = ctx.guild.id
+        if self.guild_tasks:
+            #avoid user repeating receive points
+            if ctx.author.id in self.caught_users:
+                await ctx.send("You have already caught this animal!")
+                return
+            
+            animal, points, time = self.guild_tasks['animal'], self.guild_tasks['points'], self.guild_tasks['time']
+            count_time = datetime.datetime.now() - time
+            if count_time <= datetime.timedelta(minutes=30):
+                user_config = load_user_config(ctx.guild.id, ctx.author.id)
+                user_config['user_point'] += points
+                save_user_config(ctx.author.id, ctx.guild.id, user_config)
+                self.caught_users.add(ctx.author.id)
+                await ctx.send(f"You caught {animal}! You earned {points} points! Your total points are now {user_config['user_point']}.")
+            else:
+                ctx.send("The animal has escaped, you took too long!")
+                self.guild_tasks = None
+
+        else:
+            ctx.send("There is no escaping animal to catch right now")
 
     @commands.command()
     async def roll(self, ctx, side: int = 6):

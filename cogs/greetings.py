@@ -3,60 +3,10 @@ from discord.ext import commands
 from header import Cog_Extension
 import json
 import sqlite3
+from .helper import load_guild_config, save_guild_config
 
 #add_role
 #auto_role
-
-def load_guild_config(guild_id):
-    conn = sqlite3.connect('cogs/configs/configurations.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM guild_configs WHERE guild_id = ?', (guild_id,))
-    row = cursor.fetchone()
-    print("cursor fetch succeed.")
-    conn.close()
-    if row:
-        return {
-            "guild_id": row[0],
-            "profanity_switch": row[1],
-            "auto_role_switch": row[2],
-            "welcome_message": row[3],
-            "welcome_channel": row[4],
-            "leave_message": row[5],
-            "leave_channel": row[6],
-            "trigger_channel": row[7]
-        }
-    else:
-        return {
-            "guild_id": guild_id,
-            "profanity_switch": 0,
-            "auto_role_switch": 1,
-            "welcome_message": "Welcome to the server, {user}!",
-            "welcome_channel": None,
-            "leave_message": "Goodbye, {user}!",
-            "leave_channel": None,
-            "trigger_channel": None
-        }
-
-#Save Configuration to the sqlite
-def save_guild_config(guild_id, config):
-    conn = sqlite3.connect('cogs/configs/configurations.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT OR REPLACE INTO guild_configs (guild_id, profanity_switch, auto_role_switch, welcome_message, welcome_channel, leave_message, leave_channel, trigger_channel)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        guild_id,
-        config['profanity_switch'],
-        config['auto_role_switch'],
-        config['welcome_message'],
-        config['welcome_channel'],
-        config['leave_message'],
-        config['leave_channel'],
-        config['trigger_channel']
-    ))
-    conn.commit()
-    print("Database commit succeed")
-    conn.close()
 
 class greeting(Cog_Extension):
     @commands.Cog.listener()

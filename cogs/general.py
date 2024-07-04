@@ -5,7 +5,7 @@ from profanity_check import predict
 from datetime import timedelta
 import datetime
 import sqlite3
-from .greetings import load_guild_config, save_guild_config
+from .helper import load_guild_config, save_guild_config
 import asyncio
 
 #DB DESIGN General Information:
@@ -14,40 +14,6 @@ import asyncio
 #Profanity_count INT
 #profanity_switch: bool
 #inactive_count: bool
-
-def load_user_config(guild_id, user_id):
-    conn = sqlite3.connect('cogs/configs/configurations.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM user_configs WHERE guild_id = ? AND user_id = ?', (guild_id, user_id))
-    row = cursor.fetchone()
-    print("Cursor fetch succeeded.")
-    conn.close()
-    if row:
-        return {
-            "guild_id": row[1],
-            "user_id": row[0],
-            "profanity_count": row[2],
-            "inactive_count": row[3]
-        }
-    else:
-        return {
-            "guild_id": guild_id,
-            "user_id": user_id,
-            "profanity_count": 0,
-            "inactive_count": 0
-        }
-    
-def save_user_config(user_id, guild_id, config):
-    conn = sqlite3.connect('cogs/configs/configurations.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-    INSERT OR REPLACE INTO user_configs (user_id, guild_id, profanity_count, inactive_count)
-    VALUES (?, ?, ?, ?)
-    ''', (user_id, guild_id, config['profanity_count'], config['inactive_count']))
-    
-    conn.commit()
-    conn.close()
 
 profanity_check: bool
 
