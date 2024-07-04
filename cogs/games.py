@@ -95,17 +95,17 @@ class games(Cog_Extension):
         guild_id = ctx.guild.id
         if self.guild_tasks:
             #avoid user repeating receive points
-            if ctx.author.id in self.caught_users:
+            if ctx.author.id in self.caught_user:
                 await ctx.send("You have already caught this animal!")
                 return
-            
+            #get which animal and what time and how many points user can earn
             animal, points, time = self.guild_tasks['animal'], self.guild_tasks['points'], self.guild_tasks['time']
             count_time = datetime.datetime.now() - time
             if count_time <= datetime.timedelta(minutes=30):
                 user_config = load_user_config(ctx.guild.id, ctx.author.id)
                 user_config['user_point'] += points
                 save_user_config(ctx.author.id, ctx.guild.id, user_config)
-                self.caught_users.add(ctx.author.id)
+                self.caught_user.add(ctx.author.id)
                 await ctx.send(f"You caught {animal}! You earned {points} points! Your total points are now {user_config['user_point']}.")
             else:
                 ctx.send("The animal has escaped, you took too long!")
