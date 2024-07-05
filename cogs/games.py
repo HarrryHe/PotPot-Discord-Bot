@@ -7,15 +7,16 @@ import requests
 import random
 import datetime
 import json
-from .helper import load_guild_config, save_guild_config, load_user_config, save_user_config
+from ..helper import load_guild_config, save_guild_config, load_user_config, save_user_config
 
 lock = asyncio.Lock()
 
 class games(Cog_Extension):
     def __init__(self, bot):
-        super().__init__()
+        super().__init__(bot)
         self.guild_tasks = None
         self.caught_user = set()
+        self.bot.loop.create_task(self.announce_animal())
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)

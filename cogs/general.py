@@ -5,7 +5,7 @@ from profanity_check import predict
 from datetime import timedelta
 import datetime
 import sqlite3
-from .helper import load_guild_config, save_guild_config
+from ..helper import load_guild_config, save_guild_config
 import asyncio
 
 #DB DESIGN General Information:

@@ -3,7 +3,7 @@ import sqlite3
 def load_guild_config(guild_id):
     conn = sqlite3.connect('cogs/configs/configurations.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM guild_configs WHERE guild_id = ?', (guild_id))
+    cursor.execute('SELECT * FROM guild_configs WHERE guild_id = ?', (guild_id,))
     row = cursor.fetchone()
     print("cursor fetch succeed.")
     conn.close()

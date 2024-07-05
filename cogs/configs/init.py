@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS guild_configs (
     welcome_channel TEXT,
     leave_message TEXT,
     leave_channel TEXT,
-    trigger_channel INTEGER
+    trigger_channel INTEGER,
     quest_channel INTEGER
 )
 ''')
