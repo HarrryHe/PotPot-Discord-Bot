@@ -7,9 +7,15 @@ import requests
 import random
 import datetime
 import json
-from ..helper import load_guild_config, save_guild_config, load_user_config, save_user_config
+from .helper import load_guild_config, save_guild_config, load_user_config, save_user_config
 
 lock = asyncio.Lock()
+utc = datetime.timezone.utc
+
+times = [
+    datetime.time(hour=random.randint(0, 23), minute=random.randint(0, 59), tzinfo=utc)
+    for _ in range(8)
+]
 
 class games(Cog_Extension):
     def __init__(self, bot):
@@ -44,7 +50,7 @@ class games(Cog_Extension):
             category = "very_rare"
         else:
             category = "legendary"
-        return random.choice(list(data[category].items))
+        return random.choice(list(data[category].items()))
 
     async def announce_animal(self):
         await self.bot.wait_until_ready()
@@ -109,11 +115,11 @@ class games(Cog_Extension):
                 self.caught_user.add(ctx.author.id)
                 await ctx.send(f"You caught {animal}! You earned {points} points! Your total points are now {user_config['user_point']}.")
             else:
-                ctx.send("The animal has escaped, you took too long!")
+                await ctx.send("The animal has escaped, you took too long!")
                 self.guild_tasks = None
 
         else:
-            ctx.send("There is no escaping animal to catch right now")
+            await ctx.send("There is no escaping animal to catch right now")
 
     @commands.command()
     async def roll(self, ctx, side: int = 6):

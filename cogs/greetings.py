@@ -3,7 +3,7 @@ from discord.ext import commands
 from header import Cog_Extension
 import json
 import sqlite3
-from ..helper import load_guild_config, save_guild_config
+from .helper import load_guild_config, save_guild_config
 
 #add_role
 #auto_role
