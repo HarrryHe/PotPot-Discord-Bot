@@ -18,6 +18,7 @@ class games(Cog_Extension):
         self.guild_tasks = None
         self.caught_user = set()
         self.bot.loop.create_task(self.announce_animal())
+        self.rank.start()
 
     @commands.command()
     @commands.has_permissions(manage_channels=True)
@@ -47,7 +48,7 @@ class games(Cog_Extension):
             category = "legendary"
         return random.choice(list(data[category].items()))
 
-    @tasks.loop(time=datetime.time(hour=8, minute=30, tzinfo=utc))
+    @tasks.loop(minutes=1)#time=datetime.time(hour=8, minute=30, tzinfo=utc)
     async def rank(self):
         await self.bot.wait_until_ready()
         print("Rank is running")
@@ -60,6 +61,8 @@ class games(Cog_Extension):
                 user_points = []
                 #store all the members from the guild
                 for member in members:
+                    if member.bot:
+                        continue
                     user_config = load_user_config(guild.id, member.id)
                     user_point = user_config["user_point"]
                     user_points.append((member, user_point))
