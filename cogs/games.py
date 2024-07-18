@@ -12,11 +12,6 @@ from .helper import load_guild_config, save_guild_config, load_user_config, save
 lock = asyncio.Lock()
 utc = datetime.timezone.utc
 
-times = [
-    datetime.time(hour=random.randint(0, 23), minute=random.randint(0, 59), tzinfo=utc)
-    for _ in range(8)
-]
-
 class games(Cog_Extension):
     def __init__(self, bot):
         super().__init__(bot)
@@ -52,6 +47,32 @@ class games(Cog_Extension):
             category = "legendary"
         return random.choice(list(data[category].items()))
 
+    @tasks.loop(time=datetime.time(hour=8, minute=30, tzinfo=utc))
+    async def rank(self):
+        await self.bot.wait_until_ready()
+        print("Rank is running")
+        for guild in self.bot.guilds:
+            guild_config = load_guild_config(guild.id)
+            quest_channel_id = guild_config.get('quest_channel')
+            if quest_channel_id:
+                channel = self.bot.get_channel(quest_channel_id)
+                members = guild.members
+                user_points = []
+                #store all the members from the guild
+                for member in members:
+                    user_config = load_user_config(guild.id, member.id)
+                    user_point = user_config["user_point"]
+                    user_points.append((member, user_point))
+                
+                #sort all the user_points in reverse order lambda meaning that it is a non-name temp function usually with one line
+                #it is sorted by user_point
+                user_points.sort(key=lambda x: x[1], reverse=True)
+
+                embed = discord.Embed(title="User Rank Board", description='Presenting rank information 8:30am everyday', timestamp=datetime.datetime.now(), color=0xddb6b8)
+                for i, (member, points) in enumerate(user_points, start=1):
+                        embed.add_field(name=f"{i}. {member.name}", value=f"{points} points", inline=False)
+                await channel.send(embed=embed)
+
     async def announce_animal(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
@@ -71,6 +92,8 @@ class games(Cog_Extension):
                 end = (i+1) * time_period - 1
                 time_intervals.append(random.randint(start, end))
             time_intervals.sort()
+            #Test
+            print(time_intervals)
 
             #start interpret each announcement using for loop (total 10)
             for interval in time_intervals:
