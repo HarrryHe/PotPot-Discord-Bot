@@ -4,7 +4,6 @@ from header import Cog_Extension
 from profanity_check import predict
 from datetime import timedelta
 import datetime
-import sqlite3
 from .helper import load_guild_config, save_guild_config
 import asyncio
 
@@ -18,7 +17,6 @@ import asyncio
 profanity_check: bool
 
 class general(Cog_Extension):
-
     @commands.command()
     async def info(self, ctx):
         embed = discord.Embed(title="Server Information", description=f'Server ID: {ctx.guild.id}', timestamp=datetime.datetime.now(), color=0xddb6b8)
@@ -40,7 +38,7 @@ class general(Cog_Extension):
     async def clean(self, ctx, limit: int = 100):
         await ctx.channel.purge(limit=limit)
         await ctx.send("Purge success", delete_after=5)
-    
+
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     #clean {num} messages up to 100 from {member}
@@ -50,7 +48,7 @@ class general(Cog_Extension):
 
         deleted = await ctx.channel.purge(limit=limit, check=check)
         await ctx.send(f'Deleted {len(deleted)} messages from {member.mention}.', delete_after=5)
-    
+
     #Open up or close down the profanity checker
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -62,11 +60,10 @@ class general(Cog_Extension):
             config["profanity_switch"] = 0
         await ctx.send("profanity_trigger set succussful")
         save_guild_config(ctx.guild.id, config)
-    
+
     async def apply_timeout(self, user: discord.Member, minutes: int):
         await user.timeout(timedelta(minutes=minutes))
 
-    #Currently only for 
     @commands.Cog.listener()
     async def on_message(self, message):
         guild_config = load_guild_config(message.guild.id)
@@ -83,13 +80,13 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def timeout(self, ctx, user: discord.Member, minutes: int):
-        self.apply_timeout(user,minutes)
+        await self.apply_timeout(user,minutes)
         await ctx.send(f'{minutes} timeout applied to {user.name}')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def timeout_remove(self, ctx, user: discord.Member, minutes = 0):
-        self.apply_timeout(user,0)
+        await self.apply_timeout(user,0)
         await ctx.send(f'{user.name} timeout removed')
 
     @commands.command()
@@ -106,17 +103,17 @@ class general(Cog_Extension):
         if len(options) < 2:
             await ctx.send("You must provide at least two options.")
             return
-        
+
         if len(options) == 2:
             reaction = ('👍', '👎')
         else:
             reaction = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟')[:len(options)]
-        
+
         embed = discord.Embed(title=question, description= f'{ctx.message.author} create a vote section', color=0xddb6b8)
 
         for i, option in enumerate(options):
             embed.add_field(name=f"Option {i + 1}", value=f"{reaction[i]} {option}", inline=False)
-        
+
         poll_message = await ctx.send(embed=embed)
 
         for i in reaction:
@@ -132,11 +129,11 @@ class general(Cog_Extension):
         except discord.NotFound:
             await ctx.send("Poll message not found.")
             return
-        
+
         if not poll_message.embeds:
             await ctx.send("The provided message ID does not contain an embed.")
             return
-        
+
         reactionList = ('👍', '👎', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟')
         vote_result = {}
         embed = poll_message.embeds[0]
@@ -145,7 +142,7 @@ class general(Cog_Extension):
             if reaction.emoji in reactionList:
                 # Subtract bot's own reaction
                 vote_result[reaction.emoji] = reaction.count - 1
-        
+
         results = ""
 
         for field in embed.fields:
@@ -187,7 +184,7 @@ class general(Cog_Extension):
         if before.channel and before.channel.category.name == "Temporary Channels":
             if len(before.channel.members) == 0:
                 await before.channel.delete()
-    
+
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def lock_channel(self, ctx, channel: discord.TextChannel = None):

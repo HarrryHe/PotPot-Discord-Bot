@@ -48,7 +48,7 @@ class games(Cog_Extension):
             category = "legendary"
         return random.choice(list(data[category].items()))
 
-    @tasks.loop(minutes=1)#time=datetime.time(hour=8, minute=30, tzinfo=utc)
+    @tasks.loop(time=datetime.time(hour=8, minute=30, tzinfo=utc))
     async def rank(self):
         await self.bot.wait_until_ready()
         print("Rank is running")
@@ -67,7 +67,7 @@ class games(Cog_Extension):
                     user_point = user_config["user_point"]
                     user_points.append((member, user_point))
                 
-                #sort all the user_points in reverse order lambda meaning that it is a non-name temp function usually with one line
+                #sort all the user_points in reverse order lambda meaning that it is a non-name temporary function usually with one line
                 #it is sorted by user_point
                 user_points.sort(key=lambda x: x[1], reverse=True)
 
@@ -372,7 +372,6 @@ class RussianRouletteView(View):
 
     @discord.ui.button(label="Pull The Trigger", style=discord.ButtonStyle.green)
     async def trigger_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await asyncio.sleep(1)
         embed = interaction.message.embeds[0]
 
         #disable the button for amount of time
