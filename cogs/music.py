@@ -4,7 +4,7 @@ from discord.ext import commands, tasks
 from discord.ui import Button, View
 import asyncio
 import yt_dlp
-import nacl
+
 """Remaining:
     Play Next Song (If in the queue)
     Queue (Add song into queue)"""
@@ -20,7 +20,7 @@ ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
 class music(Cog_Extension):
     def __init__(self, bot):
         self.bot = bot
-        self.queues = {}        
+        self.queues = {}
         self.current = None
         self.voice_clients = {}
 
@@ -68,6 +68,7 @@ class music(Cog_Extension):
             await self.voice_clients[ctx.guild.id].disconnect()
             #delete the queue from [ctx] guild
             del self.voice_clients[ctx.guild.id]
+            del self.queues[ctx.guild.id]
 
     @commands.command(name="play")
     async def play(self, ctx, *, search: str):
@@ -87,7 +88,7 @@ class music(Cog_Extension):
         async with ctx.typing():
             loop = asyncio.get_event_loop()
             data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}",download=False))
-
+            print(data)
             if 'entries' in data:
                 data = data['entries'][0]
 

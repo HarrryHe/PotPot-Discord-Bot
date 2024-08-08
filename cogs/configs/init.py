@@ -1,5 +1,6 @@
 import sqlite3
 
+
 #You only have to run it once when you finish setting up the database
 conn = sqlite3.connect('cogs/configs/configurations.db')
 cursor = conn.cursor()

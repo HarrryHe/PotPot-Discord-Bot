@@ -11,20 +11,24 @@ from .helper import load_guild_config, save_guild_config
 class greeting(Cog_Extension):
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        config = load_guild_config(member.guild.id)
+        config = await load_guild_config(member.guild.id)
         print(f'{member} joined.')
         channel = discord.utils.get(member.guild.channels, name=config['welcome_channel'])
         if channel:
-            welcome_message = config['welcome_message'].format(user=member.mention)
+            welcome_message = config['welcome_message']
+            if '{user}' in welcome_message:
+                welcome_message = welcome_message.format(user=member.mention)
             await channel.send(welcome_message)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         print(f'{member} removed.')
-        config = load_guild_config(member.guild.id)
+        config = await load_guild_config(member.guild.id)
         channel = discord.utils.get(member.guild.channels, name=config['leave_channel'])
         if channel:
-            leave_message = config['leave_message'].format(user=member)
+            leave_message = config['leave_message']
+            if '{user}' in leave_message:
+                leave_message = leave_message.format(user=member)
             await channel.send(leave_message)
 
     @commands.Cog.listener()
@@ -50,7 +54,7 @@ class greeting(Cog_Extension):
     @commands.command()
     async def welcome(self, ctx, action: str, *, content: str = None):
         """Set up Bot Welcoming message/channel"""
-        config = load_guild_config(ctx.guild.id)
+        config = await load_guild_config(ctx.guild.id)
         if action == 'setMessage':
             config['welcome_message'] = content
             await ctx.send(f"Welcome message set to: {content}")
@@ -62,13 +66,13 @@ class greeting(Cog_Extension):
             await ctx.send(f"Welcome channel removed")
         else:
             await ctx.send(f'Unknown Command')
-        save_guild_config(ctx.guild.id, config)
+        await save_guild_config(ctx.guild.id, config)
     
     #Leave msg set up
     @commands.command()
     async def leave(self, ctx, action: str, *, content=None):
         """Set up Bot removing message/channel"""
-        config = load_guild_config(ctx.guild.id)
+        config = await load_guild_config(ctx.guild.id)
         if action == 'setMessage':
             config['leave_message'] = content
             await ctx.send(f"Leave message set to: {content}")
@@ -80,7 +84,7 @@ class greeting(Cog_Extension):
             await ctx.send(f"Leave channel removed")
         else:
             await ctx.send(f'Unknown Command')
-        save_guild_config(ctx.guild.id, config)
+        await save_guild_config(ctx.guild.id, config)
 
 async def setup(bot):
     await bot.add_cog(greeting(bot))

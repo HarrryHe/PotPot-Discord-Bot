@@ -23,9 +23,9 @@ class games(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_channels=True)
     async def set_quest_channel(self, ctx, channel: discord.TextChannel):
-        config = load_guild_config(ctx.guild.id)
+        config = await load_guild_config(ctx.guild.id)
         config['quest_channel'] = channel.id
-        save_guild_config(ctx.guild.id, config)
+        await save_guild_config(ctx.guild.id, config)
         await ctx.send(f"Quest channel set to {channel.mention}")
 
     def select_animal(self):
@@ -53,7 +53,7 @@ class games(Cog_Extension):
         await self.bot.wait_until_ready()
         print("Rank is running")
         for guild in self.bot.guilds:
-            guild_config = load_guild_config(guild.id)
+            guild_config = await load_guild_config(guild.id)
             quest_channel_id = guild_config.get('quest_channel')
             if quest_channel_id:
                 channel = self.bot.get_channel(quest_channel_id)
@@ -63,7 +63,7 @@ class games(Cog_Extension):
                 for member in members:
                     if member.bot:
                         continue
-                    user_config = load_user_config(guild.id, member.id)
+                    user_config = await load_user_config(guild.id, member.id)
                     user_point = user_config["user_point"]
                     user_points.append((member, user_point))
                 
@@ -116,7 +116,7 @@ class games(Cog_Extension):
 
                 #in each guilds
                 for guild in self.bot.guilds:
-                    config = load_guild_config(guild.id)
+                    config = await load_guild_config(guild.id)
                     quest_channel_id = config.get('quest_channel')
                     if quest_channel_id:
                         channel = self.bot.get_channel(quest_channel_id)
@@ -135,9 +135,9 @@ class games(Cog_Extension):
             animal, points, time = self.guild_tasks['animal'], self.guild_tasks['points'], self.guild_tasks['time']
             count_time = datetime.datetime.now() - time
             if count_time <= datetime.timedelta(minutes=30):
-                user_config = load_user_config(ctx.guild.id, ctx.author.id)
+                user_config = await load_user_config(ctx.guild.id, ctx.author.id)
                 user_config['user_point'] += points
-                save_user_config(ctx.author.id, ctx.guild.id, user_config)
+                await save_user_config(ctx.author.id, ctx.guild.id, user_config)
                 self.caught_user.add(ctx.author.id)
                 await ctx.send(f"You caught {animal}! You earned {points} points! Your total points are now {user_config['user_point']}.")
             else:

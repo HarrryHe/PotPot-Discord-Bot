@@ -42,7 +42,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     #clean {num} messages up to 100 from {member}
-    async def clean_user(ctx, member: discord.Member, limit: int = 100):
+    async def clean_user(self, ctx, member: discord.Member, limit: int = 1):
         def check(m):
             return m.author == member
 
@@ -53,20 +53,20 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def profanity_trigger(self, ctx, switch: bool=False):
-        config = load_guild_config(ctx.guild.id)
+        config = await load_guild_config(ctx.guild.id)
         if switch is True:
             config["profanity_switch"] = 1
         else:
             config["profanity_switch"] = 0
         await ctx.send("profanity_trigger set succussful")
-        save_guild_config(ctx.guild.id, config)
+        await save_guild_config(ctx.guild.id, config)
 
     async def apply_timeout(self, user: discord.Member, minutes: int):
         await user.timeout(timedelta(minutes=minutes))
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        guild_config = load_guild_config(message.guild.id)
+        guild_config = await load_guild_config(message.guild.id)
         if message.author == self.bot.user:
             return
         #on message profanity checker
@@ -156,13 +156,13 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_channels=True)
     async def set_trigger_channel(self, ctx, channel: discord.VoiceChannel):
-        config = load_guild_config(ctx.guild.id)
+        config = await load_guild_config(ctx.guild.id)
         config['trigger_channel'] = channel.id
         if config['trigger_channel'] is not None:
             category = discord.utils.get(ctx.guild.categories, name="Temporary Channels")
             if category is None:
                 await ctx.guild.create_category("Temporary Channels")
-        save_guild_config(ctx.guild.id, config)
+        await save_guild_config(ctx.guild.id, config)
         await ctx.send(f'Trigger Channel for temporary voice channel creation set to {channel}')
 
     #auto create a temporary channel for user while joining certain channel
@@ -170,7 +170,9 @@ class general(Cog_Extension):
     async def on_voice_state_update(self, member, before, after):
         #read the trigger channel id from database and set the channel name 
         channel_name = f'{member.display_name}\'s temp channel'
-        trigger_channel_id = load_guild_config(member.guild.id)['trigger_channel']
+        guild_config = await load_guild_config(member.guild.id)
+        trigger_channel_id = guild_config['trigger_channel']
+
         #check if there is trigger id or not
         if trigger_channel_id is None:
             print("Trigger Channel is None")
