@@ -1,2 +1,2 @@
-<a href="https://discord.gg/NQ6SDsEc"><img src="https://img.shields.io/discord/1271308212406059069?color=%237289DA&label=DISCORD"></a>
+<a href="https://discord.gg/NQ6SDsEc"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord"></a>
 # PotPot Discord Bot
