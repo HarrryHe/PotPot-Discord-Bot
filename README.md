@@ -16,18 +16,18 @@ Optional: VSCode
 
 ## Step 1: Customize Your Discord Bot
 
-1. Create your Discord Bot at [Discord Developer Portal](https://discord.com/developers/applications)
+> 1. Create your Discord Bot at [Discord Developer Portal](https://discord.com/developers/applications)
 - Log in to your Discord account.
 - Click on `New Application` to create a new bot.
 - Give your bot a name and click `Create.`
 - In the left-hand menu, select `Bot` and then click on `Add Bot` to create the bot user.
 - Confirm by clicking `Yes, do it!` if prompted.  
 
-2. Configure Bot Settings (Under `Bot` Section)
+> 2. Configure Bot Settings (Under `Bot` Section)
 - Token: Copy the bot token. Do not share this token publicly as it grants control over your bot.
 - Enable All Intents.
 
-3. Invite your Bot under `OAuth2 URL Generator`
+> 3. Invite your Bot under `OAuth2 URL Generator`
 - Select `bot`.
 - Select `Administrator`.
 - Copy, paste, and click your generated url.
