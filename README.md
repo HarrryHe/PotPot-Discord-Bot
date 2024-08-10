@@ -11,7 +11,7 @@ PotPot is an open-source, integrated discord bot that includes 20+ server manage
 Internet  
 Python 3.9 or later  
 Running `pip3 install -r requirements.txt` to install all required packages
-Create `.env` file
+Create `.env` file  
 Optional: VSCode
 
 ## Step 1: Customize Your Discord Bot
@@ -39,7 +39,7 @@ Optional: VSCode
 2. Double check all packages are properly imported and installed.
 3. Run `init.py` inside `cogs/configs` folder.
 4. After running `init.py`, run `bot.py`.
-5. Have fun.  
+5. Have fun.
 For more information on PotPot commands, send `-help` under your server while the script is running.
 
 
