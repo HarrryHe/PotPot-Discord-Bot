@@ -1,6 +1,4 @@
-import sqlite3
 import aiosqlite
-import asyncio
 
 async def load_guild_config(guild_id):
     async with aiosqlite.connect('cogs/configs/configurations.db') as db:

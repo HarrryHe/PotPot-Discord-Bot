@@ -1,0 +1,5 @@
+aiosqlite
+discord.py
+profanity-check
+requests
+yt-dlp
