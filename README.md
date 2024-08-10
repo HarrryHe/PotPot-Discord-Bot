@@ -7,10 +7,11 @@ PotPot is an open-source, integrated discord bot that includes 20+ server manage
 
 # Setup
 
-## Prerequisite
-Internet  
+## Prerequisites
+Internet
+Download ffmpeg
 Python 3.9 or later  
-Running `pip3 install -r requirements.txt` to install all required packages
+Running `pip install -r requirements.txt` to install all required packages
 Create `.env` file  
 Optional: VSCode
 
@@ -35,11 +36,12 @@ Optional: VSCode
 
 ## Step 2: Run Discord Bot Script
 
-1. Before running our python script, copy your bot token into `env` as `DISCORD_BOT_TOKEN=Your Bot Token`.
+1. Before running our python script, copy your bot token into `.env` file as `DISCORD_BOT_TOKEN=Your Bot Token`.
 2. Double check all packages are properly imported and installed.
 3. Run `init.py` inside `cogs/configs` folder.
 4. After running `init.py`, run `bot.py`.
-5. Have fun.
+5. Have fun.  
+  
 For more information on PotPot commands, send `-help` under your server while the script is running.
 
 
