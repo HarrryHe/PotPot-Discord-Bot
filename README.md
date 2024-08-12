@@ -88,7 +88,7 @@ The bot features a daily task system where users can catch animals that have esc
 - `-pause` Pause a song.
 - `-resume` Resume a song.
 - `-skip` Skip the current song.
-- `queue` Show queue information.
+- `-queue` Show queue information.
 
 ## Hidden Commands (for test and develop purposes)
 - `-load [extension]`
