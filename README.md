@@ -51,7 +51,8 @@ For more information about PotPot commands, send `-help` in your server while th
 - `-leave [setMessage/setChannel/removeChannel] [Contents]` Set leaving message/channel or removes leaving message channel.  
 
 ## Games Cog
-The bot features a daily task system where users can catch animals that have escaped from the zoo to earn points. The game includes a ranking system that displays the user's points. Animals escape at random times, and users are notified when an escape occurs. The animals are categorized into different levels, each with a corresponding point value: Common (10 pts), Uncommon (20 pts), Rare (30 pts), Very Rare (40 pts), and Legendary (50 pts). ***Note: This feature requires the bot to be deployed and kept online 24/7.***.
+The bot features a daily task system where users can catch animals that have escaped from the zoo to earn points. The game includes a ranking system that displays the user's points. Animals escape at random times, and users are notified when an escape occurs. The animals are categorized into different levels, each with a corresponding point value: Common (10 pts), Uncommon (20 pts), Rare (30 pts), Very Rare (40 pts), and Legendary (50 pts).  
+***Note: This feature requires the bot to be deployed and kept online 24/7.***.
 - `-set_quest_channel [#channel name (text channel)]` Set daily game system channel for the guild.
 - `-catch` Catch animals that were announced as escaped within approximately 30 minutes.
 - `-roll [side number (>=3)]` Roll a {number}>= 3 sides dice.
