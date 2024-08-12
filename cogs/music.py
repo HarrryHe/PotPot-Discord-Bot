@@ -5,9 +5,6 @@ from discord.ui import Button, View
 import asyncio
 import yt_dlp
 
-"""Remaining:
-    Play Next Song (If in the queue)
-    Queue (Add song into queue)"""
 #set up (Kinda confused on where I can check all the options)
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -51,6 +48,7 @@ class music(Cog_Extension):
     #invoke bot into voice channel
     @commands.command(name="join_vc")
     async def join(self, ctx):
+        """Invite bot to voice channel"""
         if ctx.author.voice is None:
             await ctx.send("Sorry you are not in a voice channel", delete_after=5)
             return
@@ -64,6 +62,7 @@ class music(Cog_Extension):
     #disconnect bot from voice channel
     @commands.command(name="leave_vc")
     async def leave(self, ctx):
+        """Remove bot from voice channel and delete queue"""
         if ctx.guild.id in self.voice_clients:
             await self.voice_clients[ctx.guild.id].disconnect()
             #delete the queue from [ctx] guild
@@ -72,6 +71,7 @@ class music(Cog_Extension):
 
     @commands.command(name="play")
     async def play(self, ctx, *, search: str):
+        """Play a song"""
         #repeat the 'join' function
         if ctx.author.voice is None:
             await ctx.send("Sorry you are not in a voice channel", delete_after=5)
@@ -104,6 +104,7 @@ class music(Cog_Extension):
 
     @commands.command(name="pause")
     async def pause(self, ctx):
+        """Pause a song"""
         if ctx.guild.id not in self.voice_clients:
             await ctx.send("Bot is not in a voice channel.", delete_after=5)
             return
@@ -117,6 +118,7 @@ class music(Cog_Extension):
 
     @commands.command(name="resume")
     async def resume(self, ctx):
+        """Resume a song"""
         if ctx.guild.id not in self.voice_clients:
             await ctx.send("Bot is not in a voice channel.", delete_after=5)
             return
@@ -130,6 +132,7 @@ class music(Cog_Extension):
 
     @commands.command(name="skip")
     async def skip(self, ctx):
+        """Skip the current song"""
         voice_client = self.voice_clients[ctx.guild.id]
         if voice_client and voice_client.is_playing():
             voice_client.stop()
@@ -140,6 +143,7 @@ class music(Cog_Extension):
     #show the current queue
     @commands.command()
     async def queue(self, ctx):
+        """Show queue information"""
         queue = self.queues[ctx.guild.id]
         if queue:
             queue_str = '\n'.join([f"{idx + 1}. {song['title']}" for idx, song in enumerate(queue)])

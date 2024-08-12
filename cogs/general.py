@@ -19,6 +19,7 @@ profanity_check: bool
 class general(Cog_Extension):
     @commands.command()
     async def info(self, ctx):
+        """Show Guild information"""
         embed = discord.Embed(title="Server Information", description=f'Server ID: {ctx.guild.id}', timestamp=datetime.datetime.now(), color=0xddb6b8)
         embed.set_author(name="PotPot", icon_url=self.bot.user.display_avatar.url)
         if ctx.guild.icon is not None:
@@ -36,6 +37,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_messages=True)
     async def clean(self, ctx, limit: int = 100):
+        """Clear {num} of messages"""
         await ctx.channel.purge(limit=limit)
         await ctx.send("Purge success", delete_after=5)
 
@@ -43,6 +45,7 @@ class general(Cog_Extension):
     @commands.has_permissions(manage_messages=True)
     #clean {num} messages up to 100 from {member}
     async def clean_user(self, ctx, member: discord.Member, limit: int = 1):
+        """Clear certain {user} {num} of messages"""
         def check(m):
             return m.author == member
 
@@ -53,6 +56,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def profanity_trigger(self, ctx, switch: bool=False):
+        """Enable/disable profanity check (sensitive words will be prohibited, and users who send them will receive a 2-minute timeout)"""
         config = await load_guild_config(ctx.guild.id)
         if switch is True:
             config["profanity_switch"] = 1
@@ -80,18 +84,20 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def timeout(self, ctx, user: discord.Member, minutes: int):
+        """Timeout a {user} for {minutes}"""
         await self.apply_timeout(user,minutes)
         await ctx.send(f'{minutes} timeout applied to {user.name}')
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def timeout_remove(self, ctx, user: discord.Member, minutes = 0):
+        """Remove timeout of a {user}"""
         await self.apply_timeout(user,0)
         await ctx.send(f'{user.name} timeout removed')
 
     @commands.command()
     async def poll(self, ctx, question: str, *options: str):
-
+        """Start a poll (Note: it only allows up to 10 options)"""
         if not question:
             await ctx.send("You must input your vote description")
             return
@@ -124,6 +130,7 @@ class general(Cog_Extension):
 
     @commands.command()
     async def poll_result(self, ctx, poll_message_id: int):
+        """Show certain poll result"""
         try:
             poll_message = await ctx.fetch_message(poll_message_id)
         except discord.NotFound:
@@ -156,6 +163,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_channels=True)
     async def set_trigger_channel(self, ctx, channel: discord.VoiceChannel):
+        """Set the entry channel for temporary voice channel creation"""
         config = await load_guild_config(ctx.guild.id)
         config['trigger_channel'] = channel.id
         if config['trigger_channel'] is not None:
@@ -190,6 +198,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def lock_channel(self, ctx, channel: discord.TextChannel = None):
+        """Lock a text channel"""
         channel = channel or ctx.channel
         #get the permission for overwrites
         overwrite = channel.overwrites_for(ctx.guild.default_role)
@@ -200,6 +209,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def unlock_channel(self, ctx, channel: discord.TextChannel = None):
+        """Unlock a text channel"""
         channel = channel or ctx.channel
         #get the permission for overwrites
         overwrite = channel.overwrites_for(ctx.guild.default_role)
@@ -210,6 +220,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     async def add_role(self, ctx, member: discord.Member, role: discord.Role):
+        """Add {user} to a {role}"""
         if role in member.roles:
             await ctx.send(f"{member.display_name} already in {role.name}")
         else:
@@ -219,6 +230,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     async def remove_role(self, ctx, member: discord.Member, role: discord.Role):
+        """Remove {user} from a {role}"""
         if role not in member.roles:
             await ctx.send(f"{member.display_name} is not in {role.name}")
         else:
@@ -228,6 +240,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     async def create_role(self, ctx, *, role_name: str):
+        """Create a role tag"""
         existing_role = discord.utils.get(ctx.guild.roles, name=role_name)
         if existing_role:
             await ctx.send(f"{role_name} already exist")
@@ -238,6 +251,7 @@ class general(Cog_Extension):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def prune(self, ctx, days: int = 30):
+        """Detect inactive members around {days}"""
         threshold = datetime.datetime.now(datetime.UTC) - timedelta(days=days)
         inactive_members = []
         active_members = []

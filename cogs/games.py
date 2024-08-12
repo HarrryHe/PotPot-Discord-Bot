@@ -23,6 +23,7 @@ class games(Cog_Extension):
     @commands.command()
     @commands.has_permissions(manage_channels=True)
     async def set_quest_channel(self, ctx, channel: discord.TextChannel):
+        """Sets daily game system channel for the guild"""
         config = await load_guild_config(ctx.guild.id)
         config['quest_channel'] = channel.id
         await save_guild_config(ctx.guild.id, config)
@@ -125,6 +126,7 @@ class games(Cog_Extension):
 
     @commands.command()
     async def catch(self, ctx):
+        """Catches animals that were announced as escaped within approximately 30 minutes"""
         guild_id = ctx.guild.id
         if self.guild_tasks:
             #avoid user repeating receive points
@@ -149,7 +151,7 @@ class games(Cog_Extension):
 
     @commands.command()
     async def roll(self, ctx, side: int = 6):
-        """Roll a {number}>= 3 sides dice."""
+        """Roll a {number}>= 3 sides dice"""
         if side < 3:
             await ctx.send("the sides of the dice must be above or equal to 3")
         else:
@@ -158,19 +160,19 @@ class games(Cog_Extension):
 
     @commands.command()
     async def flip(self, ctx):
-        """Flip a coin."""
+        """Flip a coin"""
         result = random.choice(['heads', 'tails'])
         await ctx.send(f"result: {result}")
 
     @commands.command()
     async def NumGuessGame(self, ctx):
-        """Start a guessing game with buttons."""
+        """Start a guessing number game with buttons"""
         view = GuessingGameView()
         await ctx.send("Click a button to guess the number between 0 and 9", view=view)
 
     @commands.command()
     async def RockPaperScissor(self, ctx):
-        """Start a rock paper scissor game."""
+        """Start a rock paper scissor game"""
         user = ctx.author
         choices = ["🖐️", "✌️", "✊"]
         choice = random.choice(choices)
@@ -179,6 +181,7 @@ class games(Cog_Extension):
 
     @commands.command()
     async def RussianRoulette(self, ctx):
+        """Start a Russian Roulette game"""
         loading_bar = ""
         empty_bar = "░░" * 5
         temp_count = 5
