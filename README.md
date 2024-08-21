@@ -5,7 +5,7 @@ PotPot is an open-source, integrated discord bot that includes 20+ server manage
 **My Website**: [https://harrryhe.github.io/harry.github.io](https://harrryhe.github.io/harry.github.io)  
 **Contact Me**: [harry.he@temple.edu](harry.he@temple.edu)
 
-# Setup
+# Setup 🔨
 
 ## Prerequisites
 Internet  
@@ -44,7 +44,7 @@ Optional: VSCode
   
 For more information about PotPot commands, send `-help` in your server while the bot is running.
 
-# Commands
+# Commands 🥳
 ## Greetings Cog
 - `-ping` Return the bot's latency in milliseconds.  
 - `-welcome [setMessage/setChannel/removeChannel] [Contents]` Set welcoming message/channel or removes welcoming message channel.
