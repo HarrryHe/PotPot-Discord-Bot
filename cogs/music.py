@@ -44,6 +44,7 @@ class music(Cog_Extension):
         source = discord.FFmpegPCMAudio(url, options='-vn')
         ctx.voice_client.play(source, after=lambda e: self.bot.loop.create_task(self.play_next(ctx)))
         await ctx.send(f'Now playing: {title}')
+        
     
     #invoke bot into voice channel
     @commands.command(name="join_vc")
@@ -95,11 +96,20 @@ class music(Cog_Extension):
             url = data['url']
             title = data['title']
             song = {'url': url, 'title': title}
+            uploader = data.get('uploader', 'Unknown')
+            description = data.get('description', 'No description available')
+            thumbnail = data.get('thumbnail')
+            duration = data.get('duration')
             self.add_to_queue(ctx.guild.id, song)
 
             await ctx.send(f'Added {title} to the queue.')
 
             if not voice_client.is_playing() and not voice_client.is_paused():
+                embed = discord.Embed(title=f"Now Playing: {title}", url=url, description=description, color=0xddb6b8)
+                embed.set_author(name=f"Uploaded By: {uploader}")
+                embed.set_thumbnail(url=thumbnail)
+                embed.add_field(name="Duration", value=duration, inline=False)
+                await ctx.send(embed=embed)
                 await self.play_next(ctx)
 
     @commands.command(name="pause")
@@ -151,6 +161,11 @@ class music(Cog_Extension):
         else:
             await ctx.send("The queue is empty.", delete_after=5)
 
+
+#UI Class Implementation
+class playView(View):
+    def __init__(self):
+        super.__init__()
 
 async def setup(bot):
     await bot.add_cog(music(bot))
