@@ -109,7 +109,37 @@ class music(Cog_Extension):
                 embed.set_author(name=f"Uploaded By: {uploader}")
                 embed.set_thumbnail(url=thumbnail)
                 embed.add_field(name="Duration", value=duration, inline=False)
-                await ctx.send(embed=embed)
+
+                view = View()
+
+                #Pause Button Implementation
+                async def pause_button_callBack(interaction: discord.Interaction):
+                    await self.pause(ctx)
+                    await interaction.response.send_message("Paused the song.", ephemeral=True)
+
+                pauseButton = Button(label="Pause", emoji="⏸️", style=discord.ButtonStyle.red)
+                pauseButton.callback = pause_button_callBack
+                view.add_item(pauseButton)
+
+                #Resume Button Implementation
+                async def resume_button_callBack(interaction: discord.Interaction):
+                    await self.resume(ctx)
+                    await interaction.response.send_message("Resumed the song.", ephemeral=True)
+
+                resumeButton = Button(label="Resume", emoji="▶️", style=discord.ButtonStyle.green)
+                resumeButton.callback = resume_button_callBack
+                view.add_item(resumeButton)
+
+                #Skip Button Implementation
+                async def skip_button_callback(interaction: discord.Interaction):
+                    await self.skip(ctx)
+                    await interaction.response.send_message("Resumed the song.", ephemeral=True)
+
+                skipButton = Button(label="Skip", emoji="⏭️", style=discord.ButtonStyle.green)
+                skipButton.callback = skip_button_callback
+                view.add_item(skipButton)
+                
+                await ctx.send(embed=embed, view=view)
                 await self.play_next(ctx)
 
     @commands.command(name="pause")
