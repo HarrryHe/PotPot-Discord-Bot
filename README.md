@@ -9,7 +9,7 @@ PotPot is an open-source, integrated discord bot that includes 20+ server manage
 
 ## Prerequisites
 Internet  
-Download ffmpeg (if possible)  
+Download ffmpeg 
 Python 3.9 or later  
 Running `pip install -r requirements.txt` to install all required packages  
 Create `.env` file  
