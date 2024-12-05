@@ -4,3 +4,4 @@ profanity-check
 requests
 yt-dlp
 alt-profanity-check
+flask
