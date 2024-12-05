@@ -1,6 +1,27 @@
 import os
 import discord
 from discord.ext import commands
+from flask import Flask
+import threading
+
+# 创建一个简单的 Flask 应用
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is running!"
+
+# 启动 Flask 服务器的线程
+def run_web_server():
+    port = int(os.environ.get("PORT", 5000))  # 获取 PORT 环境变量，默认为 5000
+    app.run(host="0.0.0.0", port=port)
+
+# 在后台线程中启动 Web 服务
+def start_web_server():
+    thread = threading.Thread(target=run_web_server)
+    thread.daemon = True
+    thread.start()
+
 
 bot = commands.Bot(command_prefix='-', intents=discord.Intents.all())
 
