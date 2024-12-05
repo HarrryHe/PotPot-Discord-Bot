@@ -51,4 +51,5 @@ async def load_extensions():
             await bot.load_extension(f'cogs.{filename[:-3]}')
 
 if __name__ == "__main__":
+    start_web_server()
     bot.run(os.getenv("DISCORD_BOT_TOKEN"))
