@@ -9,6 +9,7 @@ import yt_dlp
 ytdl_format_options = {
     'format': 'bestaudio/best',
     'noplaylist': True,
+    'rm-cache-dir': True,
 }
 
 #create youtubeDL instance
@@ -39,6 +40,46 @@ class music(Cog_Extension):
         song = self.queues[guild_id].pop(0)
         url = song['url']
         title = song['title']
+        thumbnail = song.get('thumbnail', '')
+        description = song.get('description', 'No description available')
+        duration = song.get('duration', 'Unknown')
+        uploader = song.get('uploader', 'Unknown')
+
+        embed = discord.Embed(title=f"Now Playing: {title}", url=url, description=description, color=0xddb6b8)
+        embed.set_author(name=f"Uploaded By: {uploader}")
+        embed.set_thumbnail(url=thumbnail)
+        embed.add_field(name="Duration", value=duration, inline=False)
+
+        view = View()
+
+        #Pause Button Implementation
+        async def pause_button_callBack(interaction: discord.Interaction):
+            await self.pause(ctx)
+            await interaction.response.send_message("Paused the song.", ephemeral=True)
+
+        pauseButton = Button(label="Pause", emoji="⏸️", style=discord.ButtonStyle.red)
+        pauseButton.callback = pause_button_callBack
+        view.add_item(pauseButton)
+
+        #Resume Button Implementation
+        async def resume_button_callBack(interaction: discord.Interaction):
+            await self.resume(ctx)
+            await interaction.response.send_message("Resumed the song.", ephemeral=True)
+
+        resumeButton = Button(label="Resume", emoji="▶️", style=discord.ButtonStyle.green)
+        resumeButton.callback = resume_button_callBack
+        view.add_item(resumeButton)
+
+        #Skip Button Implementation
+        async def skip_button_callback(interaction: discord.Interaction):
+            await self.skip(ctx)
+            await interaction.response.send_message("Resumed the song.", ephemeral=True)
+
+        skipButton = Button(label="Skip", emoji="⏭️", style=discord.ButtonStyle.green)
+        skipButton.callback = skip_button_callback
+        view.add_item(skipButton)
+        
+        await ctx.send(embed=embed, view=view)
 
         #let the voice client play the song, and after it finished call the function itself until theres no song left
         source = discord.FFmpegPCMAudio(url, options='-vn')
@@ -95,51 +136,16 @@ class music(Cog_Extension):
 
             url = data['url']
             title = data['title']
-            song = {'url': url, 'title': title}
             uploader = data.get('uploader', 'Unknown')
             description = data.get('description', 'No description available')
             thumbnail = data.get('thumbnail')
             duration = data.get('duration')
+            song = {'url': url, 'title': title, 'thumbnail': thumbnail, 'description': description, 'duration': duration, 'uploader': uploader}
             self.add_to_queue(ctx.guild.id, song)
 
             await ctx.send(f'Added {title} to the queue.')
 
             if not voice_client.is_playing() and not voice_client.is_paused():
-                embed = discord.Embed(title=f"Now Playing: {title}", url=url, description=description, color=0xddb6b8)
-                embed.set_author(name=f"Uploaded By: {uploader}")
-                embed.set_thumbnail(url=thumbnail)
-                embed.add_field(name="Duration", value=duration, inline=False)
-
-                view = View()
-
-                #Pause Button Implementation
-                async def pause_button_callBack(interaction: discord.Interaction):
-                    await self.pause(ctx)
-                    await interaction.response.send_message("Paused the song.", ephemeral=True)
-
-                pauseButton = Button(label="Pause", emoji="⏸️", style=discord.ButtonStyle.red)
-                pauseButton.callback = pause_button_callBack
-                view.add_item(pauseButton)
-
-                #Resume Button Implementation
-                async def resume_button_callBack(interaction: discord.Interaction):
-                    await self.resume(ctx)
-                    await interaction.response.send_message("Resumed the song.", ephemeral=True)
-
-                resumeButton = Button(label="Resume", emoji="▶️", style=discord.ButtonStyle.green)
-                resumeButton.callback = resume_button_callBack
-                view.add_item(resumeButton)
-
-                #Skip Button Implementation
-                async def skip_button_callback(interaction: discord.Interaction):
-                    await self.skip(ctx)
-                    await interaction.response.send_message("Resumed the song.", ephemeral=True)
-
-                skipButton = Button(label="Skip", emoji="⏭️", style=discord.ButtonStyle.green)
-                skipButton.callback = skip_button_callback
-                view.add_item(skipButton)
-                
-                await ctx.send(embed=embed, view=view)
                 await self.play_next(ctx)
 
     @commands.command(name="pause")
